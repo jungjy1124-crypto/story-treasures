@@ -594,3 +594,240 @@
   margin-left: 2px;
 }
 .chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ══════════════════════════════════════
+   RESPONSIVE — APP SHELL
+   ══════════════════════════════════════ */
+.app-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  box-shadow: 0 0 40px rgba(0,0,0,0.08);
+}
+
+.home-content {
+  padding: 28px 20px 80px;
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: 860px;
+  }
+
+  /* Header */
+  .chaek-header {
+    padding: 16px 40px;
+  }
+  .logo {
+    font-size: 22px;
+  }
+
+  /* Hero */
+  .hero-info {
+    padding: 24px 40px 28px;
+  }
+  .book-title-hero {
+    font-size: 28px;
+  }
+  .book-meta {
+    font-size: 13px;
+  }
+  .rating-num {
+    font-size: 16px;
+  }
+  .stars {
+    font-size: 14px;
+  }
+  .rating-count {
+    font-size: 11px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 4px 12px;
+  }
+  .books-row {
+    padding: 0 40px;
+  }
+  .book-spine {
+    height: 180px;
+  }
+  .b-main { width: 38px; }
+  .b1 { width: 30px; }
+  .b2 { width: 24px; }
+  .b3 { width: 22px; }
+  .b5 { width: 28px; }
+  .b6 { width: 26px; }
+  .b7 { width: 32px; }
+  .b8 { width: 20px; }
+
+  /* Content cards */
+  .intro-card {
+    margin: 28px 40px;
+    padding: 28px 32px;
+    font-size: 14.5px;
+    line-height: 1.85;
+  }
+  .section-header {
+    padding: 36px 40px 16px;
+    font-size: 22px;
+  }
+  .chapter-card {
+    margin: 0 40px 16px;
+    border-radius: 16px;
+  }
+  .chapter-header {
+    padding: 24px 28px 18px;
+    gap: 18px;
+  }
+  .chapter-num {
+    font-size: 34px;
+    min-width: 34px;
+  }
+  .chapter-title {
+    font-size: 18px;
+  }
+  .chapter-quote {
+    margin: 0 28px 20px;
+    padding: 20px 24px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+  .chapter-body {
+    padding: 0 28px 28px;
+    font-size: 15px;
+    line-height: 1.95;
+  }
+  .closing-card {
+    margin: 0 40px 16px;
+    padding: 28px 32px;
+    border-radius: 16px;
+  }
+  .closing-card p {
+    font-size: 15px;
+  }
+  .question-card {
+    margin: 0 40px 40px;
+    padding: 28px 32px;
+    border-radius: 16px;
+  }
+  .question-text {
+    font-size: 16px;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    max-width: 860px;
+    padding: 12px 0 22px;
+  }
+  .nav-item {
+    font-size: 12px;
+    gap: 5px;
+  }
+  .nav-icon {
+    font-size: 22px;
+  }
+
+  /* Chat */
+  .chat-window {
+    max-width: 420px;
+    height: 520px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .app-shell {
+    max-width: 960px;
+  }
+
+  .chaek-header {
+    padding: 18px 60px;
+  }
+  .logo {
+    font-size: 24px;
+  }
+
+  .hero-info {
+    padding: 28px 60px 32px;
+  }
+  .book-title-hero {
+    font-size: 32px;
+  }
+  .books-row {
+    padding: 0 60px;
+    gap: 3px;
+  }
+  .book-spine {
+    height: 200px;
+  }
+  .b-main { width: 42px; }
+  .b1 { width: 34px; }
+  .b2 { width: 28px; }
+  .b3 { width: 24px; }
+  .b5 { width: 30px; }
+  .b6 { width: 28px; }
+  .b7 { width: 36px; }
+  .b8 { width: 22px; }
+
+  .intro-card {
+    margin: 32px 60px;
+    padding: 32px 40px;
+    font-size: 15px;
+  }
+  .section-header {
+    padding: 40px 60px 18px;
+    font-size: 24px;
+  }
+  .chapter-card {
+    margin: 0 60px 18px;
+  }
+  .chapter-header {
+    padding: 28px 36px 20px;
+  }
+  .chapter-num {
+    font-size: 38px;
+  }
+  .chapter-title {
+    font-size: 20px;
+  }
+  .chapter-quote {
+    margin: 0 36px 24px;
+    padding: 22px 28px;
+    font-size: 16px;
+  }
+  .chapter-body {
+    padding: 0 36px 32px;
+    font-size: 15.5px;
+  }
+  .closing-card {
+    margin: 0 60px 18px;
+    padding: 32px 40px;
+  }
+  .closing-card p {
+    font-size: 15.5px;
+  }
+  .question-card {
+    margin: 0 60px 48px;
+    padding: 32px 40px;
+  }
+  .question-text {
+    font-size: 17px;
+  }
+
+  .bottom-nav {
+    max-width: 960px;
+  }
+}
+
+/* Home content responsive */
+@media (min-width: 768px) {
+  .home-content {
+    padding: 36px 40px 80px;
+  }
+}
+@media (min-width: 1200px) {
+  .home-content {
+    padding: 44px 60px 80px;
+  }
+}

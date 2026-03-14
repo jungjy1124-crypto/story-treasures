@@ -18,7 +18,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div style={{ padding: "28px 20px 80px" }}>
+    <div className="home-content">
       <div
         style={{
           fontFamily: "'Playfair Display', serif",
