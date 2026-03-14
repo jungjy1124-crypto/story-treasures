@@ -247,14 +247,16 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
   };
 
   const addTag = (lang: "ko" | "en") => {
-    if (lang === "ko" && newTagKo.trim()) {
-      update({ tags_ko: [...summary.tags_ko, newTagKo.trim()] });
-      setNewTagKo("");
+  const addTag = (lang: "ko" | "en") => {
+    const raw = lang === "ko" ? newTagKo : newTagEn;
+    if (!raw.trim()) return;
+    const parsed = parseTagsFromText(raw);
+    if (parsed.length > 0) {
+      const key = lang === "ko" ? "tags_ko" : "tags_en";
+      update({ [key]: [...summary[key], ...parsed] });
     }
-    if (lang === "en" && newTagEn.trim()) {
-      update({ tags_en: [...summary.tags_en, newTagEn.trim()] });
-      setNewTagEn("");
-    }
+    if (lang === "ko") setNewTagKo("");
+    else setNewTagEn("");
   };
 
   const handleBulkParse = () => {
