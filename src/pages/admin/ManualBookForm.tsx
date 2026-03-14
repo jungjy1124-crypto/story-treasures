@@ -56,6 +56,18 @@ interface Props {
   initialData?: ManualSummary | null;
 }
 
+function parseTagsFromText(text: string): string[] {
+  if (!text) return [];
+  const backtickMatches = text.match(/`([^`]+)`/g);
+  if (backtickMatches && backtickMatches.length > 0) {
+    return backtickMatches.map(t => t.replace(/`/g, '').trim()).filter(t => t.length > 0);
+  }
+  if (text.includes(',') || text.includes('，')) {
+    return text.split(/[,，]/).map(t => t.trim()).filter(t => t.length > 0);
+  }
+  return text.split(/\s+/).map(t => t.trim()).filter(t => t.length > 0);
+}
+
 function parseBulkText(text: string): Partial<ManualSummary> {
   const result: Partial<ManualSummary> = {};
   let filledSections = 0;
