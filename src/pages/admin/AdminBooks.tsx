@@ -1,32 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface MockBook {
-  id: string;
-  title_ko: string;
-  author: string;
-  year: number;
-  cover_theme: string;
-  created_at: string;
-}
-
-const INITIAL_BOOKS: MockBook[] = [
-  { id: "1", title_ko: "죄와 벌", author: "도스토옙스키", year: 1866, cover_theme: "theme-dark", created_at: "2024-12-01" },
-  { id: "2", title_ko: "두 도시 이야기", author: "찰스 디킨스", year: 1859, cover_theme: "theme-crimson", created_at: "2024-12-05" },
-];
+import { getBooks, deleteBook, type StoredBook } from "@/lib/bookStorage";
 
 export default function AdminBooks() {
   const navigate = useNavigate();
-  const [books, setBooks] = useState<MockBook[]>(INITIAL_BOOKS);
+  const [books, setBooks] = useState<StoredBook[]>([]);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    setBooks(getBooks());
+  }, []);
 
   const filtered = books.filter(
     (b) => b.title_ko.includes(search) || b.author.includes(search)
   );
 
   const handleDelete = (id: string) => {
-    setBooks((prev) => prev.filter((b) => b.id !== id));
+    deleteBook(id);
+    setBooks(getBooks());
     setConfirmId(null);
   };
 
@@ -76,7 +68,7 @@ export default function AdminBooks() {
                 </td>
                 <td>{book.author}</td>
                 <td>{book.year}</td>
-                <td>{book.created_at}</td>
+                <td>{book.created_at.slice(0, 10)}</td>
                 <td className="admin-table-actions">
                   <button
                     className="admin-btn-sm"
@@ -97,7 +89,6 @@ export default function AdminBooks() {
         </table>
       </div>
 
-      {/* Delete confirm dialog */}
       {confirmId && (
         <div className="admin-overlay" onClick={() => setConfirmId(null)}>
           <div className="admin-dialog" onClick={(e) => e.stopPropagation()}>

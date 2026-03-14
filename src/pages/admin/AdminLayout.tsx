@@ -57,6 +57,9 @@ export default function AdminLayout() {
 
       {/* Bottom tabs (mobile) */}
       <nav className="admin-bottom-nav">
+        <button className="admin-bottom-item" onClick={() => navigate("/")}>
+          🏠 메인
+        </button>
         {NAV_ITEMS.map((item) => (
           <button
             key={item.path}
