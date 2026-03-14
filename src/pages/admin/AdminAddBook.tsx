@@ -96,8 +96,8 @@ export default function AdminAddBook() {
           "anthropic-dangerous-direct-browser-access": "true",
         },
         body: JSON.stringify({
-          model: "claude-opus-4-20250514",
-          max_tokens: 4000,
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
           messages: [{
             role: "user",
              content: `You are a literary editor for Chaekgado.
