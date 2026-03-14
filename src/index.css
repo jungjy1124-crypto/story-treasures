@@ -469,6 +469,12 @@
    BOOK DETAIL PAGE
    ══════════════════════════════════════ */
 
+.book-detail-hero {
+  background: linear-gradient(180deg, #1c1007 0%, #2a1a0a 55%, #3a2510 100%);
+  overflow: hidden;
+  padding-top: 52px;
+}
+
 /* ── HERO — 서가 (Book Detail) ── */
 .shelf-scene {
   position: relative;
