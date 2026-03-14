@@ -244,7 +244,7 @@ ${excerpt}`,
           </div>
           <button
             className="admin-btn-primary"
-            disabled={!allFilled}
+            disabled={!canProceed}
             onClick={() => setStep(2)}
           >
             다음 단계 →
