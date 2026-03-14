@@ -15,16 +15,7 @@ const Layout = () => {
 
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
-      <div
-        style={{
-          maxWidth: 480,
-          margin: "0 auto",
-          minHeight: "100vh",
-          background: "var(--bg)",
-          position: "relative",
-          boxShadow: "0 0 40px rgba(0,0,0,0.08)",
-        }}
-      >
+      <div className="app-shell">
         {/* HEADER */}
         <div className="chaek-header">
           <Link to={isKo ? "/ko" : "/en"} className="logo">
