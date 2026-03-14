@@ -55,12 +55,13 @@
     @apply border-[var(--border)];
   }
   body {
-    background: var(--bg);
+    background: #1a1208;
     color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 16px;
     line-height: 1.8;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 }
 
