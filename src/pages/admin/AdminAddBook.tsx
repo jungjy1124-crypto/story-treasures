@@ -57,14 +57,14 @@ export default function AdminAddBook() {
     pages: "",
     cover_theme: "theme-dark",
   });
-  const [summary, setSummary] = useState<typeof MOCK_SUMMARY | null>(null);
+  const [summary, setSummary] = useState<ReturnType<typeof createMockSummary> | null>(null);
 
   const allFilled = info.gutenberg_url && info.title_ko && info.title_en && info.author && info.year && info.pages;
 
   const handleGenerate = () => {
     setLoading(true);
     setTimeout(() => {
-      setSummary({ ...MOCK_SUMMARY });
+      setSummary(createMockSummary(info.author, info.title_ko));
       setLoading(false);
       setStep(3);
     }, 2000);
