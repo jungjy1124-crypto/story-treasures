@@ -410,7 +410,39 @@
   margin-top: 8px;
 }
 
-/* ══════════════════════════════════════
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: rgba(26,18,8,0.96);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(201,168,76,0.1);
+  padding: 10px 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  padding: 4px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-item.active { color: var(--accent); }
+.nav-icon { font-size: 18px; line-height: 1; }
+
+.spacer { height: 80px; }
+
    RESPONSIVE — APP SHELL
    ══════════════════════════════════════ */
 .app-shell {
