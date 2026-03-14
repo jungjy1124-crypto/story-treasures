@@ -100,13 +100,16 @@ export default function AdminAddBook() {
           max_tokens: 4000,
           messages: [{
             role: "user",
-            content: `You are a literary editor for Chaekgado.
-Summarize this classic novel. Return ONLY valid JSON, no markdown.
-
-Book: ${info.title_en} by ${info.author}
+             content: `You are a literary editor for Chaekgado.
+Analyze this classic novel. Return ONLY valid JSON, no markdown.
 
 JSON format:
 {
+  "title_ko": "한국어 제목",
+  "title_en": "English Title",
+  "author": "Author Name",
+  "year": "Publication year (number as string)",
+  "pages": "Estimated page count (number as string)",
   "intro": "2-3 sentences about the author and interesting writing backstory",
   "chapters": [
     {
