@@ -251,6 +251,30 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
     }
   };
 
+  const handleBulkParse = () => {
+    if (!bulkText.trim()) return;
+    const parsed = parseBulkText(bulkText) as any;
+    const filledCount = parsed._filledCount || 0;
+    delete parsed._filledCount;
+    
+    setSummary(prev => ({
+      ...prev,
+      ...(parsed.intro ? { intro: parsed.intro } : {}),
+      ...(parsed.chapters ? { chapters: parsed.chapters } : {}),
+      ...(parsed.closing_ko ? { closing_ko: parsed.closing_ko } : {}),
+      ...(parsed.closing_en ? { closing_en: parsed.closing_en } : {}),
+      ...(parsed.question_ko ? { question_ko: parsed.question_ko } : {}),
+      ...(parsed.question_en ? { question_en: parsed.question_en } : {}),
+      ...(parsed.tags_ko ? { tags_ko: parsed.tags_ko } : {}),
+      ...(parsed.tags_en ? { tags_en: parsed.tags_en } : {}),
+      ...(parsed.rating ? { rating: parsed.rating } : {}),
+    }));
+
+    setBulkOpen(false);
+    setBulkMessage(`✅ ${filledCount}개 섹션이 자동으로 채워졌어요! 내용을 확인하고 수정해주세요.`);
+    setTimeout(() => setBulkMessage(""), 5000);
+  };
+
   const handleNext = () => {
     if (!summary.intro.trim()) {
       setValidationError("소개를 입력해주세요.");
@@ -262,7 +286,6 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
       return;
     }
     setValidationError("");
-    // Save draft before advancing
     localStorage.setItem(DRAFT_KEY, JSON.stringify(summary));
     onNext(summary);
   };
@@ -271,9 +294,46 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
     <div className="manual-form-wrapper">
       {savedIndicator && <div className="manual-saved-indicator">임시저장됨 ✓</div>}
 
+      {bulkMessage && (
+        <div className="manual-bulk-success">{bulkMessage}</div>
+      )}
+
       {validationError && (
         <div className="admin-login-error" style={{ marginBottom: 16 }}>{validationError}</div>
       )}
+
+      {/* 일괄 붙여넣기 */}
+      <div className="admin-card">
+        <button
+          className="manual-bulk-toggle"
+          onClick={() => setBulkOpen(!bulkOpen)}
+        >
+          <span>{bulkOpen ? "📋 텍스트 일괄 입력" : "📋 다시 붙여넣기"}</span>
+          <span className="admin-chevron">{bulkOpen ? "▲" : "▼"}</span>
+        </button>
+
+        {bulkOpen && (
+          <div className="manual-bulk-body">
+            <textarea
+              className="admin-textarea"
+              rows={15}
+              placeholder={"클로드가 생성한 요약 전체를 여기에 붙여넣으세요.\n\n챕터 1, 챕터 2... 형식이면 자동으로 분류됩니다."}
+              value={bulkText}
+              onChange={(e) => setBulkText(e.target.value)}
+            />
+            <button
+              className="admin-btn-primary manual-bulk-btn"
+              onClick={handleBulkParse}
+              disabled={!bulkText.trim()}
+            >
+              ✨ 자동 분류하기
+            </button>
+            <p className="manual-bulk-help">
+              아래 형식을 지원해요: 작가소개 / 챕터N 제목·인용·본문 / 마무리분석 / 독자질문 / 태그 / 평점
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* 소개 */}
       <div className="admin-card">
