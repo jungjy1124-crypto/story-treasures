@@ -429,13 +429,10 @@
 
   /* Header */
   .chaek-header {
-    padding: 16px 40px;
-  }
-  .logo {
-    font-size: 22px;
+    padding: 0 40px;
   }
 
-  /* Hero */
+  /* Book detail page */
   .hero-info {
     padding: 24px 40px 28px;
   }
@@ -546,45 +543,38 @@
     height: 520px;
   }
 
-  /* Home page desktop */
-  .home-books-row {
-    padding: 0 40px;
-    gap: 3px;
+  /* Home page tablet */
+  .hero-tagline {
+    padding: 56px 40px 36px;
   }
-  .home-spine {
-    height: 180px;
+  .tagline-main {
+    font-size: 42px;
   }
-  .home-spine-featured { width: 38px !important; }
-  .home-book-info {
-    padding: 24px 40px 28px;
+  .search-bar {
+    margin: 0 40px 24px;
   }
-  .home-book-title {
-    font-size: 28px;
+  .filter-row {
+    padding: 0 40px 24px;
   }
-  .home-book-meta {
-    font-size: 13px;
+  .books-section {
+    padding: 0 40px 100px;
   }
-  .home-tag {
-    font-size: 11px;
-    padding: 4px 12px;
+  .books-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
-  .home-cards-section {
-    padding: 32px 40px 0;
+  .book-card.featured .book-cover {
+    width: 160px;
+    min-width: 160px;
   }
-  .home-section-title {
-    font-size: 26px;
+  .book-cover {
+    height: 140px;
   }
-  .home-card-title {
+  .book-cover-title {
+    font-size: 16px;
+  }
+  .book-card.featured .book-cover-title {
     font-size: 20px;
   }
-  .home-ch-title {
-    font-size: 14px;
-  }
-  .home-ch-quote {
-    font-size: 13px;
-    padding: 10px 16px;
-  }
-}
 
 @media (min-width: 1200px) {
   .app-shell {
