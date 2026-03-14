@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import ChatWidget from "./ChatWidget";
 
@@ -6,6 +7,7 @@ const Layout = () => {
   const navigate = useNavigate();
   const isKo = pathname.startsWith("/ko");
   const isAdmin = !!localStorage.getItem("cgAdmin");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const switchTo = (lang: "ko" | "en") => {
     const base = lang === "ko" ? "/ko" : "/en";
@@ -13,9 +15,24 @@ const Layout = () => {
     navigate(base + rest || base);
   };
 
+  const handleAdminClick = () => {
+    setMenuOpen(false);
+    if (isAdmin) {
+      navigate("/admin/books");
+    } else {
+      navigate("/admin/login");
+    }
+  };
+
+  const handleLogout = () => {
+    setMenuOpen(false);
+    localStorage.removeItem("cgAdmin");
+    window.location.reload();
+  };
+
   return (
     <div className="app-outer">
-      {/* HEADER — full width dark bg */}
+      {/* HEADER */}
       <div className="chaek-header">
         <div className="chaek-header-inner">
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -41,18 +58,41 @@ const Layout = () => {
                 EN
               </div>
             </div>
-            <div className="menu-btn">☰</div>
+            <div className="menu-btn" onClick={() => setMenuOpen(!menuOpen)}>☰</div>
           </div>
         </div>
       </div>
 
-      {/* MAIN CONTENT — centered 480px */}
+      {/* Menu dropdown */}
+      {menuOpen && (
+        <>
+          <div className="menu-overlay" onClick={() => setMenuOpen(false)} />
+          <div className="menu-dropdown">
+            {isAdmin ? (
+              <>
+                <button className="menu-dropdown-item" onClick={handleAdminClick}>
+                  📚 관리자 대시보드
+                </button>
+                <button className="menu-dropdown-item" onClick={handleLogout}>
+                  🚪 로그아웃
+                </button>
+              </>
+            ) : (
+              <button className="menu-dropdown-item" onClick={handleAdminClick}>
+                🔐 {isKo ? "관리자 로그인" : "Admin Login"}
+              </button>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* MAIN CONTENT */}
       <div className="app-shell">
         <Outlet />
         <div className="spacer" />
       </div>
 
-      {/* BOTTOM NAV — full width dark bg */}
+      {/* BOTTOM NAV */}
       <div className="bottom-nav">
         <div className="bottom-nav-inner">
           <Link
@@ -78,7 +118,6 @@ const Layout = () => {
         </div>
       </div>
 
-      {/* CHAT WIDGET */}
       <ChatWidget />
     </div>
   );
