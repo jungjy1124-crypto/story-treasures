@@ -48,6 +48,8 @@ export default function AdminAddBook() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState("");
+  const [error, setError] = useState("");
   const [info, setInfo] = useState<BookInfo>({
     gutenberg_url: "",
     title_ko: "",
@@ -59,15 +61,93 @@ export default function AdminAddBook() {
   });
   const [summary, setSummary] = useState<ReturnType<typeof createMockSummary> | null>(null);
 
+  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
   const allFilled = info.gutenberg_url && info.title_ko && info.title_en && info.author && info.year && info.pages;
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    if (!apiKey) {
+      setError("API 키가 설정되지 않았어요. 관리자에게 문의하세요.");
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      setSummary(createMockSummary(info.author, info.title_ko));
-      setLoading(false);
+    setError("");
+
+    try {
+      // Step 1: Fetch Gutenberg text
+      setLoadingMsg("원문을 불러오는 중...");
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(info.gutenberg_url)}`;
+      const textRes = await fetch(proxyUrl);
+      if (!textRes.ok) throw new Error("FETCH_FAIL");
+      const fullText = await textRes.text();
+      const excerpt = fullText.slice(0, 50000);
+
+      // Step 2: Call Anthropic API
+      setLoadingMsg("AI가 요약을 생성하고 있어요... (30-60초 소요)");
+      const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-opus-4-20250514",
+          max_tokens: 4000,
+          messages: [{
+            role: "user",
+            content: `You are a literary editor for Chaekgado.
+Summarize this classic novel. Return ONLY valid JSON, no markdown.
+
+Book: ${info.title_en} by ${info.author}
+
+JSON format:
+{
+  "intro": "2-3 sentences about the author and interesting writing backstory",
+  "chapters": [
+    {
+      "number": 1,
+      "title_ko": "챕터 제목",
+      "title_en": "Chapter Title",
+      "quote_ko": "핵심 장면 2-3문장. 문학적 문체로.",
+      "quote_en": "Same scene in English, literary style.",
+      "body_ko": "2-3 paragraphs in Korean",
+      "body_en": "2-3 paragraphs in English"
+    }
+  ],
+  "closing_ko": "3단락 마무리 분석",
+  "closing_en": "3 paragraph closing analysis",
+  "question_ko": "독자를 향한 성찰적 질문 2문장",
+  "question_en": "Reflective question for readers",
+  "tags_ko": ["태그1", "태그2", "태그3", "태그4"],
+  "tags_en": ["tag1", "tag2", "tag3", "tag4"],
+  "rating": 4.2
+}
+
+Generate exactly 6 chapters. Warm literary tone.
+
+Novel excerpt:
+${excerpt}`,
+          }],
+        }),
+      });
+
+      if (!aiRes.ok) throw new Error("API_FAIL");
+      const data = await aiRes.json();
+      const parsed = JSON.parse(data.content[0].text);
+      setSummary(parsed);
       setStep(3);
-    }, 2000);
+    } catch (err: any) {
+      if (err.message === "FETCH_FAIL") {
+        setError("원문을 가져올 수 없어요. URL을 확인해주세요.");
+      } else {
+        setError("요약 생성에 실패했어요. 다시 시도해주세요.");
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMsg("");
+    }
   };
 
   const handleSave = () => {
