@@ -169,19 +169,13 @@ function parseBulkText(text: string): Partial<ManualSummary> {
   // 5. Tags
   const tagsKoBlock = extract(/태그\s*\(KO\)[^\n]*\n/i, /(?:태그\s*\(EN\)|Tags\s*\(EN\)|평점)/i);
   if (tagsKoBlock) {
-    const backtickTags = [...tagsKoBlock.matchAll(/`([^`]+)`/g)].map(m => m[1]);
-    result.tags_ko = backtickTags.length > 0
-      ? backtickTags
-      : tagsKoBlock.split(/[,，]/).map(t => t.trim()).filter(Boolean);
+    result.tags_ko = parseTagsFromText(tagsKoBlock);
     if (result.tags_ko.length > 0) filledSections++;
   }
 
   const tagsEnBlock = extract(/(?:태그\s*\(EN\)|Tags\s*\(EN\))[^\n]*\n/i, /(?:평점)/i);
   if (tagsEnBlock) {
-    const backtickTags = [...tagsEnBlock.matchAll(/`([^`]+)`/g)].map(m => m[1]);
-    result.tags_en = backtickTags.length > 0
-      ? backtickTags
-      : tagsEnBlock.split(/[,，]/).map(t => t.trim()).filter(Boolean);
+    result.tags_en = parseTagsFromText(tagsEnBlock);
     if (result.tags_en.length > 0) filledSections++;
   }
 
