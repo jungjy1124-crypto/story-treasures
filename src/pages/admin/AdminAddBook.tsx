@@ -235,16 +235,28 @@ ${excerpt}`,
             <p>{info.author} · {info.year}</p>
           </div>
 
+          {!apiKey && (
+            <div className="admin-login-error" style={{ marginBottom: 16 }}>
+              ⚠️ API 키가 설정되지 않았어요. 관리자에게 문의하세요.
+            </div>
+          )}
+
+          {error && (
+            <div className="admin-login-error" style={{ marginBottom: 16 }}>
+              {error}
+            </div>
+          )}
+
           {loading ? (
             <div className="admin-loading-area">
               <div className="admin-spinner" />
-              <p className="admin-loading-text">원문을 분석하고 있어요...</p>
-              <p className="admin-loading-sub">최대 30초 정도 걸릴 수 있어요</p>
+              <p className="admin-loading-text">{loadingMsg}</p>
+              <p className="admin-loading-sub">잠시만 기다려주세요</p>
             </div>
           ) : (
             <div className="admin-generate-area">
               <div className={`admin-spine-preview ${info.cover_theme}`} />
-              <button className="admin-btn-primary large" onClick={handleGenerate}>
+              <button className="admin-btn-primary large" onClick={handleGenerate} disabled={!apiKey}>
                 ✨ AI 요약 생성하기
               </button>
               <p className="admin-generate-desc">
