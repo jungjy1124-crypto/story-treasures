@@ -82,7 +82,7 @@ export default function AdminAddBook() {
       if (!textRes.ok) throw new Error("FETCH_FAIL");
       const fullText = await textRes.text();
       console.log('Text length:', fullText.length);
-      const excerpt = fullText.slice(0, 50000);
+      const excerpt = fullText.slice(0, 30000);
 
       // Step 2: Call Anthropic API
       setLoadingMsg("AI가 요약을 생성하고 있어요... (30-60초 소요)");
@@ -96,8 +96,8 @@ export default function AdminAddBook() {
           "anthropic-dangerous-direct-browser-access": "true",
         },
         body: JSON.stringify({
-          model: "claude-opus-4-20250514",
-          max_tokens: 4000,
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
           messages: [{
             role: "user",
              content: `You are a literary editor for Chaekgado.
@@ -149,7 +149,17 @@ ${excerpt}`,
       }
 
       const data = JSON.parse(responseText);
-      const parsed = JSON.parse(data.content[0].text);
+      let parsed;
+      try {
+        parsed = JSON.parse(data.content[0].text);
+        if (!parsed.intro || !parsed.chapters || parsed.chapters.length === 0) {
+          throw new Error('요약 데이터가 불완전해요. 다시 시도해주세요.');
+        }
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Raw response:', data.content[0].text);
+        throw new Error('요약 형식이 올바르지 않아요. 다시 시도해주세요.');
+      }
       // Auto-fill book info from AI response
       setInfo(prev => ({
         ...prev,
