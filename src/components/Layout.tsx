@@ -13,10 +13,10 @@ const Layout = () => {
   };
 
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
-      <div className="app-shell">
-        {/* HEADER */}
-        <div className="chaek-header">
+    <div className="app-outer">
+      {/* HEADER — full width dark bg */}
+      <div className="chaek-header">
+        <div className="chaek-header-inner">
           <Link to={isKo ? "/ko" : "/en"} className="logo">
             Chaek<span>gado</span>
           </Link>
@@ -38,12 +38,17 @@ const Layout = () => {
             <div className="menu-btn">☰</div>
           </div>
         </div>
+      </div>
 
-        {/* MAIN CONTENT */}
+      {/* MAIN CONTENT — centered 480px */}
+      <div className="app-shell">
         <Outlet />
+        <div className="spacer" />
+      </div>
 
-        {/* BOTTOM NAV */}
-        <div className="bottom-nav">
+      {/* BOTTOM NAV — full width dark bg */}
+      <div className="bottom-nav">
+        <div className="bottom-nav-inner">
           <Link
             to={isKo ? "/ko" : "/en"}
             className={`nav-item ${
@@ -65,10 +70,10 @@ const Layout = () => {
             <div>{isKo ? "내 서재" : "My Shelf"}</div>
           </div>
         </div>
-
-        {/* CHAT WIDGET */}
-        <ChatWidget />
       </div>
+
+      {/* CHAT WIDGET */}
+      <ChatWidget />
     </div>
   );
 };
