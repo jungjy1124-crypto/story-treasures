@@ -20,7 +20,7 @@ export default function AdminLayout() {
       <header className="admin-header">
         <div className="admin-header-left">
           <span className="admin-logo" onClick={() => navigate("/admin/books")}>
-            📚 Chaekgado
+            📚 Chaekga
           </span>
           <span className="admin-badge">관리자</span>
         </div>
