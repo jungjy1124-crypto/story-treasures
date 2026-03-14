@@ -5,6 +5,7 @@ const Layout = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const isKo = pathname.startsWith("/ko");
+  const isAdmin = !!localStorage.getItem("cgAdmin");
 
   const switchTo = (lang: "ko" | "en") => {
     const base = lang === "ko" ? "/ko" : "/en";
@@ -17,9 +18,14 @@ const Layout = () => {
       {/* HEADER — full width dark bg */}
       <div className="chaek-header">
         <div className="chaek-header-inner">
-          <Link to={isKo ? "/ko" : "/en"} className="logo">
-            Chaek<span>gado</span>
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Link to={isKo ? "/ko" : "/en"} className="logo">
+              Chaek<span>gado</span>
+            </Link>
+            {isAdmin && (
+              <span className="admin-mode-badge">관리자 모드</span>
+            )}
+          </div>
           <div className="header-right">
             <div className="lang-toggle">
               <div

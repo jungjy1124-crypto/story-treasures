@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import AdminBookEditor from "./AdminBookEditor";
+import { saveBook, type StoredBook } from "@/lib/bookStorage";
 
 const THEMES = [
   { value: "theme-dark", label: "거의 검정" },
@@ -186,9 +187,39 @@ ${excerpt}`,
   };
 
   const handleSave = () => {
+    if (!summary) return;
+    const book: StoredBook = {
+      id: crypto.randomUUID(),
+      title_ko: info.title_ko,
+      title_en: info.title_en,
+      author: info.author,
+      year: Number(info.year) || 0,
+      pages: Number(info.pages) || 0,
+      cover_theme: info.cover_theme,
+      rating: summary.rating || 4.0,
+      intro_ko: summary.intro || "",
+      intro_en: (summary as any).intro_en || summary.intro || "",
+      closing_ko: summary.closing_ko || "",
+      closing_en: summary.closing_en || "",
+      question_ko: summary.question_ko || "",
+      question_en: summary.question_en || "",
+      tags_ko: summary.tags_ko || [],
+      tags_en: summary.tags_en || [],
+      chapters: summary.chapters.map((ch: any) => ({
+        number: ch.number,
+        title_ko: ch.title_ko,
+        title_en: ch.title_en,
+        quote_ko: ch.quote_ko,
+        quote_en: ch.quote_en,
+        body_ko: ch.body_ko,
+        body_en: ch.body_en,
+      })),
+      created_at: new Date().toISOString(),
+    };
+    saveBook(book);
     toast({
       title: "✅ 책이 추가됐어요!",
-      description: "백엔드 연결 후 실제 저장됩니다",
+      description: "책이 저장되었습니다",
     });
     navigate("/admin/books");
   };

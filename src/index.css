@@ -1461,3 +1461,121 @@ select.admin-input { appearance: auto; }
 .admin-dialog p { margin-bottom: 20px; color: white; }
 .admin-dialog-actions { display: flex; gap: 10px; justify-content: center; }
 
+/* Admin mode badge in public header */
+.admin-mode-badge {
+  background: rgba(201,168,76,0.2);
+  border: 1px solid rgba(201,168,76,0.4);
+  color: #c9a84c;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Admin edit pill on book cards */
+.admin-edit-pill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: #c9a84c;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 5;
+}
+.book-card:hover .admin-edit-pill,
+.admin-edit-pill:focus { opacity: 1; }
+
+/* Section edit button */
+.editable-section { position: relative; }
+.section-edit {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.editable-section:hover .section-edit { opacity: 1; }
+
+/* Inline edit */
+.inline-edit-area { margin-top: 4px; }
+.inline-edit-textarea {
+  width: 100%;
+  min-height: 80px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 8px;
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+.inline-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.inline-edit-save, .inline-edit-cancel {
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: #c9a84c;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.inline-edit-cancel {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+}
+
+/* Floating save bar */
+.floating-save-bar {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(26,18,8,0.95);
+  border: 1px solid rgba(201,168,76,0.4);
+  border-radius: 16px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+}
+.floating-save-btn {
+  background: #c9a84c;
+  color: #1a1208;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Admin sidebar home button */
+.admin-sidebar-home {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  padding: 8px 16px;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: color 0.2s;
+}
+.admin-sidebar-home:hover { color: white; }
