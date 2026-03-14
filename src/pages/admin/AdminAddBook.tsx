@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import AdminBookEditor from "./AdminBookEditor";
+import { saveBook, type StoredBook } from "@/lib/bookStorage";
 
 const THEMES = [
   { value: "theme-dark", label: "거의 검정" },
