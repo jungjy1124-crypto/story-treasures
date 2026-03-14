@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import AdminBookEditor from "./AdminBookEditor";
+import ManualBookForm, { loadDraft, clearDraft, type ManualSummary } from "./ManualBookForm";
 import { saveBook, type StoredBook } from "@/lib/bookStorage";
 
 const THEMES = [
@@ -12,28 +13,6 @@ const THEMES = [
   { value: "theme-purple", label: "보라" },
   { value: "theme-green", label: "진한 초록" },
 ];
-
-function createMockSummary(author: string, titleKo: string) {
-  return {
-    intro: `${author}의 ${titleKo}은 ...`,
-    chapters: Array.from({ length: 6 }, (_, i) => ({
-      number: i + 1,
-      title_ko: `챕터 ${i + 1}`,
-      title_en: `Chapter ${i + 1}`,
-      quote_ko: "인용 문장이 여기에 생성됩니다.",
-      quote_en: "A generated quote will appear here.",
-      body_ko: "본문 내용이 여기에 생성됩니다.",
-      body_en: "Generated body text will appear here.",
-    })),
-    closing_ko: "마무리 분석이 여기에 생성됩니다.",
-    closing_en: "Closing analysis will appear here.",
-    question_ko: "독자를 위한 질문이 여기에 생성됩니다.",
-    question_en: "A reflective question will appear here.",
-    tags_ko: ["태그1", "태그2", "태그3"],
-    tags_en: ["tag1", "tag2", "tag3"],
-    rating: 4.0,
-  };
-}
 
 interface BookInfo {
   gutenberg_url: string;
@@ -60,34 +39,53 @@ export default function AdminAddBook() {
     pages: "",
     cover_theme: "theme-dark",
   });
-  const [summary, setSummary] = useState<ReturnType<typeof createMockSummary> | null>(null);
+  const [summary, setSummary] = useState<any>(null);
+  const [mode, setMode] = useState<"manual" | "ai">("manual");
+  const [showDraftBanner, setShowDraftBanner] = useState(false);
+  const [draftData, setDraftData] = useState<ManualSummary | null>(null);
+  const [manualInitial, setManualInitial] = useState<ManualSummary | null>(null);
 
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
   const canProceed = !!info.gutenberg_url.trim();
+
+  // Check for draft on mount
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft) {
+      setDraftData(draft);
+      setShowDraftBanner(true);
+    }
+  }, []);
+
+  const handleResumeDraft = () => {
+    setManualInitial(draftData);
+    setShowDraftBanner(false);
+    setMode("manual");
+    setStep(2);
+  };
+
+  const handleNewStart = () => {
+    clearDraft();
+    setManualInitial(null);
+    setShowDraftBanner(false);
+  };
 
   const handleGenerate = async () => {
     if (!apiKey) {
       setError("API 키가 설정되지 않았어요. 관리자에게 문의하세요.");
       return;
     }
-
     setLoading(true);
     setError("");
-
     try {
-      // Step 1: Fetch Gutenberg text
       setLoadingMsg("원문을 불러오는 중...");
-      console.log('Fetching from:', info.gutenberg_url);
       const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(info.gutenberg_url)}`;
       const textRes = await fetch(proxyUrl);
       if (!textRes.ok) throw new Error("FETCH_FAIL");
       const fullText = await textRes.text();
-      console.log('Text length:', fullText.length);
       const excerpt = fullText.slice(0, 30000);
 
-      // Step 2: Call Anthropic API
       setLoadingMsg("AI가 요약을 생성하고 있어요... (30-60초 소요)");
-      console.log('Calling Anthropic API...');
       const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -101,7 +99,7 @@ export default function AdminAddBook() {
           max_tokens: 8000,
           messages: [{
             role: "user",
-             content: `You are a literary editor for Chaekgado.
+            content: `You are a literary editor for Chaekgado.
 Analyze this classic novel. Return ONLY valid JSON, no markdown.
 
 JSON format:
@@ -140,28 +138,21 @@ ${excerpt}`,
         }),
       });
 
-      console.log('API status:', aiRes.status);
       const responseText = await aiRes.text();
-      console.log('API response:', responseText);
-
       if (!aiRes.ok) {
         setError(`API 오류 (${aiRes.status}): ${responseText}`);
         return;
       }
-
       const data = JSON.parse(responseText);
       let parsed;
       try {
         parsed = JSON.parse(data.content[0].text);
         if (!parsed.intro || !parsed.chapters || parsed.chapters.length === 0) {
-          throw new Error('요약 데이터가 불완전해요. 다시 시도해주세요.');
+          throw new Error('요약 데이터가 불완전해요.');
         }
       } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        console.error('Raw response:', data.content[0].text);
         throw new Error('요약 형식이 올바르지 않아요. 다시 시도해주세요.');
       }
-      // Auto-fill book info from AI response
       setInfo(prev => ({
         ...prev,
         title_ko: parsed.title_ko || prev.title_ko,
@@ -173,8 +164,6 @@ ${excerpt}`,
       setSummary(parsed);
       setStep(3);
     } catch (err: any) {
-      console.error('Summary generation failed:', err);
-      console.error('Error details:', JSON.stringify(err, null, 2));
       if (err.message === "FETCH_FAIL") {
         setError("원문을 가져올 수 없어요. URL을 확인해주세요.");
       } else {
@@ -184,6 +173,11 @@ ${excerpt}`,
       setLoading(false);
       setLoadingMsg("");
     }
+  };
+
+  const handleManualNext = (manualSummary: ManualSummary) => {
+    setSummary(manualSummary);
+    setStep(3);
   };
 
   const handleSave = () => {
@@ -217,6 +211,7 @@ ${excerpt}`,
       created_at: new Date().toISOString(),
     };
     saveBook(book);
+    clearDraft();
     toast({
       title: "✅ 책이 추가됐어요!",
       description: "책이 저장되었습니다",
@@ -228,11 +223,22 @@ ${excerpt}`,
     <div>
       <h1 className="admin-page-title">새 책 추가</h1>
 
+      {/* Draft recovery banner */}
+      {showDraftBanner && (
+        <div className="manual-draft-banner">
+          <span>📝 작성 중인 내용이 있어요. 이어서 작성할까요?</span>
+          <div className="manual-draft-banner-actions">
+            <button className="admin-btn-primary" onClick={handleResumeDraft}>이어서 작성</button>
+            <button className="admin-btn-secondary" onClick={handleNewStart}>새로 시작</button>
+          </div>
+        </div>
+      )}
+
       {/* Step indicator */}
       <div className="admin-steps">
         <span className={`admin-step${step >= 1 ? " active" : ""}`}>① 기본 정보</span>
         <span className="admin-step-arrow">→</span>
-        <span className={`admin-step${step >= 2 ? " active" : ""}`}>② AI 요약 생성</span>
+        <span className={`admin-step${step >= 2 ? " active" : ""}`}>② {mode === "ai" ? "AI 요약 생성" : "내용 입력"}</span>
         <span className="admin-step-arrow">→</span>
         <span className={`admin-step${step >= 3 ? " active" : ""}`}>③ 검토 및 저장</span>
       </div>
@@ -285,7 +291,6 @@ ${excerpt}`,
           </div>
           <button
             className="admin-btn-primary"
-            disabled={!canProceed}
             onClick={() => setStep(2)}
           >
             다음 단계 →
@@ -295,45 +300,77 @@ ${excerpt}`,
 
       {/* Step 2 */}
       {step === 2 && (
-        <div className="admin-card admin-step2">
-          <div className="admin-step2-info">
-            <p><strong>{info.title_ko}</strong> / {info.title_en}</p>
-            <p>{info.author} · {info.year}</p>
+        <div>
+          {/* Mode tabs */}
+          <div className="manual-mode-tabs">
+            <button
+              className={`manual-mode-tab${mode === "manual" ? " active" : ""}`}
+              onClick={() => setMode("manual")}
+            >
+              ✍️ 직접 입력
+            </button>
+            <button
+              className={`manual-mode-tab${mode === "ai" ? " active" : ""}`}
+              onClick={() => setMode("ai")}
+            >
+              ✨ AI 자동 생성
+            </button>
           </div>
 
-          {!apiKey && (
-            <div className="admin-login-error" style={{ marginBottom: 16 }}>
-              ⚠️ API 키가 설정되지 않았어요. 관리자에게 문의하세요.
-            </div>
-          )}
-
-          {error && (
-            <div className="admin-login-error" style={{ marginBottom: 16 }}>
-              {error}
-            </div>
-          )}
-
-          {loading ? (
-            <div className="admin-loading-area">
-              <div className="admin-spinner" />
-              <p className="admin-loading-text">{loadingMsg}</p>
-              <p className="admin-loading-sub">잠시만 기다려주세요</p>
-            </div>
+          {mode === "manual" ? (
+            <ManualBookForm
+              onBack={() => setStep(1)}
+              onNext={handleManualNext}
+              initialData={manualInitial}
+            />
           ) : (
-            <div className="admin-generate-area">
-              <div className={`admin-spine-preview ${info.cover_theme}`} />
-              <button className="admin-btn-primary large" onClick={handleGenerate} disabled={!apiKey}>
-                ✨ AI 요약 생성하기
+            /* AI mode - existing flow */
+            <div className="admin-card admin-step2">
+              <div className="admin-step2-info">
+                <p><strong>{info.title_ko}</strong> / {info.title_en}</p>
+                <p>{info.author} · {info.year}</p>
+              </div>
+
+              {!apiKey && (
+                <div className="admin-login-error" style={{ marginBottom: 16 }}>
+                  ⚠️ API 키가 설정되지 않았어요. 관리자에게 문의하세요.
+                </div>
+              )}
+
+              {error && (
+                <div className="admin-login-error" style={{ marginBottom: 16 }}>
+                  {error}
+                </div>
+              )}
+
+              {loading ? (
+                <div className="admin-loading-area">
+                  <div className="admin-spinner" />
+                  <p className="admin-loading-text">{loadingMsg}</p>
+                  <p className="admin-loading-sub">잠시만 기다려주세요</p>
+                </div>
+              ) : (
+                <div className="admin-generate-area">
+                  <div className={`admin-spine-preview ${info.cover_theme}`} />
+                  <button className="admin-btn-primary large" onClick={handleGenerate} disabled={!apiKey || !canProceed}>
+                    ✨ AI 요약 생성하기
+                  </button>
+                  {!canProceed && (
+                    <p className="admin-generate-desc" style={{ color: "rgba(255,100,100,0.7)" }}>
+                      Gutenberg URL을 먼저 입력해주세요
+                    </p>
+                  )}
+                  <p className="admin-generate-desc">
+                    Gutenberg 원문을 분석해 6개 챕터 요약을 자동 생성해요
+                  </p>
+                </div>
+              )}
+
+              <button className="admin-btn-secondary" onClick={() => setStep(1)}>
+                ← 이전 단계
               </button>
-              <p className="admin-generate-desc">
-                Gutenberg 원문을 분석해 6개 챕터 요약을 자동 생성해요
-              </p>
             </div>
           )}
-
-          <button className="admin-btn-secondary" onClick={() => setStep(1)}>
-            ← 이전 단계
-          </button>
         </div>
       )}
 
