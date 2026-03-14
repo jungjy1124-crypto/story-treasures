@@ -135,7 +135,7 @@ const BookDetailPage = () => {
   return (
     <>
       {/* HERO */}
-      <div className="hero">
+      <div className="book-detail-hero">
         <div className="shelf-scene">
           <div className="books-row">
             <div className="book-spine b1"></div>
