@@ -12,25 +12,27 @@ const THEMES = [
   { value: "theme-green", label: "진한 초록" },
 ];
 
-const MOCK_SUMMARY = {
-  intro: "표도르 도스토옙스키는 19세기 러시아 문학의 거장으로, 인간 심리의 깊은 곳을 탐구한 작가입니다. 이 작품은 상트페테르부르크를 배경으로 한 빈곤한 전직 대학생의 도덕적 갈등을 다룹니다.",
-  chapters: Array.from({ length: 6 }, (_, i) => ({
-    number: i + 1,
-    title_ko: `제${i + 1}부: 챕터 제목`,
-    title_en: `Part ${i + 1}: Chapter Title`,
-    quote_ko: "어둠 속에서도 빛은 존재한다. 그것을 찾는 것은 우리의 몫이다.",
-    quote_en: "Even in darkness, light exists. Finding it is our responsibility.",
-    body_ko: "이 장에서는 주인공의 내적 갈등이 심화됩니다. 그는 자신의 행동이 정당한 것인지 끊임없이 고민하며, 주변 인물들과의 관계를 통해 인간 본성의 복잡함을 드러냅니다.",
-    body_en: "In this chapter, the protagonist's internal conflict deepens. He constantly questions the justification of his actions, revealing the complexity of human nature through his relationships with surrounding characters.",
-  })),
-  closing_ko: "이 작품은 죄의식과 구원의 가능성에 대한 깊은 성찰을 담고 있습니다. 도스토옙스키는 인간의 고통과 도덕적 회복의 과정을 섬세하게 그려냅니다.",
-  closing_en: "This work contains deep reflections on guilt and the possibility of redemption. Dostoevsky delicately portrays the process of human suffering and moral recovery.",
-  question_ko: "우리는 과연 누군가의 고통을 온전히 이해할 수 있을까요? 그리고 그 이해가 진정한 용서로 이어질 수 있을까요?",
-  question_en: "Can we truly understand someone's suffering? And can that understanding lead to genuine forgiveness?",
-  tags_ko: ["러시아문학", "심리소설", "도덕", "구원"],
-  tags_en: ["Russian Literature", "Psychological Novel", "Morality", "Redemption"],
-  rating: 4.2,
-};
+function createMockSummary(author: string, titleKo: string) {
+  return {
+    intro: `${author}의 ${titleKo}은 ...`,
+    chapters: Array.from({ length: 6 }, (_, i) => ({
+      number: i + 1,
+      title_ko: `챕터 ${i + 1}`,
+      title_en: `Chapter ${i + 1}`,
+      quote_ko: "인용 문장이 여기에 생성됩니다.",
+      quote_en: "A generated quote will appear here.",
+      body_ko: "본문 내용이 여기에 생성됩니다.",
+      body_en: "Generated body text will appear here.",
+    })),
+    closing_ko: "마무리 분석이 여기에 생성됩니다.",
+    closing_en: "Closing analysis will appear here.",
+    question_ko: "독자를 위한 질문이 여기에 생성됩니다.",
+    question_en: "A reflective question will appear here.",
+    tags_ko: ["태그1", "태그2", "태그3"],
+    tags_en: ["tag1", "tag2", "tag3"],
+    rating: 4.0,
+  };
+}
 
 interface BookInfo {
   gutenberg_url: string;
