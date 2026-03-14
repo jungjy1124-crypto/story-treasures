@@ -150,6 +150,15 @@ ${excerpt}`,
 
       const data = JSON.parse(responseText);
       const parsed = JSON.parse(data.content[0].text);
+      // Auto-fill book info from AI response
+      setInfo(prev => ({
+        ...prev,
+        title_ko: parsed.title_ko || prev.title_ko,
+        title_en: parsed.title_en || prev.title_en,
+        author: parsed.author || prev.author,
+        year: parsed.year || prev.year,
+        pages: parsed.pages || prev.pages,
+      }));
       setSummary(parsed);
       setStep(3);
     } catch (err: any) {
