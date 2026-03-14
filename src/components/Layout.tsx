@@ -6,11 +6,10 @@ const Layout = () => {
   const navigate = useNavigate();
   const isKo = pathname.startsWith("/ko");
 
-  const toggleLanguage = () => {
-    const newPath = isKo
-      ? pathname.replace(/^\/ko/, "/en") || "/en"
-      : pathname.replace(/^\/en/, "/ko") || "/ko";
-    navigate(newPath);
+  const switchTo = (lang: "ko" | "en") => {
+    const base = lang === "ko" ? "/ko" : "/en";
+    const rest = pathname.replace(/^\/(ko|en)/, "");
+    navigate(base + rest || base);
   };
 
   return (
@@ -21,8 +20,22 @@ const Layout = () => {
           <Link to={isKo ? "/ko" : "/en"} className="logo">
             Chaek<span>gado</span>
           </Link>
-          <div className="header-menu" onClick={toggleLanguage} title="Toggle language">
-            ☰
+          <div className="header-right">
+            <div className="lang-toggle">
+              <div
+                className={`lang-btn ${isKo ? "active" : ""}`}
+                onClick={() => switchTo("ko")}
+              >
+                KO
+              </div>
+              <div
+                className={`lang-btn ${!isKo ? "active" : ""}`}
+                onClick={() => switchTo("en")}
+              >
+                EN
+              </div>
+            </div>
+            <div className="menu-btn">☰</div>
           </div>
         </div>
 
@@ -37,16 +50,20 @@ const Layout = () => {
               pathname === "/ko" || pathname === "/en" ? "active" : ""
             }`}
           >
-            <div className="nav-icon">🏠</div>
+            <div className="nav-icon">📚</div>
             <div>{isKo ? "홈" : "Home"}</div>
           </Link>
           <Link
             to={isKo ? "/ko/library" : "/en/library"}
             className={`nav-item ${pathname.includes("library") ? "active" : ""}`}
           >
-            <div className="nav-icon">☰</div>
-            <div>{isKo ? "목록" : "Library"}</div>
+            <div className="nav-icon">🔖</div>
+            <div>{isKo ? "저장" : "Saved"}</div>
           </Link>
+          <div className="nav-item">
+            <div className="nav-icon">👤</div>
+            <div>{isKo ? "내 서재" : "My Shelf"}</div>
+          </div>
         </div>
 
         {/* CHAT WIDGET */}
