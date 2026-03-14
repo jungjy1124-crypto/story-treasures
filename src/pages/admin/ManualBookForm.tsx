@@ -499,3 +499,4 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
     </div>
   );
 }
+
