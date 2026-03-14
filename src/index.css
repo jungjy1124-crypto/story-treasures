@@ -65,6 +65,12 @@
   }
 }
 
+/* ── APP OUTER ── */
+.app-outer {
+  min-height: 100vh;
+  background: #1a1208;
+}
+
 /* ── HEADER ── */
 .chaek-header {
   position: fixed;
@@ -72,12 +78,16 @@
   z-index: 200;
   background: rgba(26,18,8,0.95);
   backdrop-filter: blur(12px);
-  padding: 0 20px;
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+}
+.chaek-header-inner {
+  max-width: 480px;
+  margin: 0 auto;
   height: 52px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(201,168,76,0.1);
 }
 .logo {
   font-family: 'EB Garamond', serif;
