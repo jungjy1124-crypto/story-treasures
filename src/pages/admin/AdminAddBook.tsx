@@ -82,7 +82,7 @@ export default function AdminAddBook() {
       if (!textRes.ok) throw new Error("FETCH_FAIL");
       const fullText = await textRes.text();
       console.log('Text length:', fullText.length);
-      const excerpt = fullText.slice(0, 50000);
+      const excerpt = fullText.slice(0, 30000);
 
       // Step 2: Call Anthropic API
       setLoadingMsg("AI가 요약을 생성하고 있어요... (30-60초 소요)");
