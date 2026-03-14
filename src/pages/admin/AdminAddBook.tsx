@@ -76,14 +76,17 @@ export default function AdminAddBook() {
     try {
       // Step 1: Fetch Gutenberg text
       setLoadingMsg("원문을 불러오는 중...");
+      console.log('Fetching from:', info.gutenberg_url);
       const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(info.gutenberg_url)}`;
       const textRes = await fetch(proxyUrl);
       if (!textRes.ok) throw new Error("FETCH_FAIL");
       const fullText = await textRes.text();
+      console.log('Text length:', fullText.length);
       const excerpt = fullText.slice(0, 50000);
 
       // Step 2: Call Anthropic API
       setLoadingMsg("AI가 요약을 생성하고 있어요... (30-60초 소요)");
+      console.log('Calling Anthropic API...');
       const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -133,16 +136,26 @@ ${excerpt}`,
         }),
       });
 
-      if (!aiRes.ok) throw new Error("API_FAIL");
-      const data = await aiRes.json();
+      console.log('API status:', aiRes.status);
+      const responseText = await aiRes.text();
+      console.log('API response:', responseText);
+
+      if (!aiRes.ok) {
+        setError(`API 오류 (${aiRes.status}): ${responseText}`);
+        return;
+      }
+
+      const data = JSON.parse(responseText);
       const parsed = JSON.parse(data.content[0].text);
       setSummary(parsed);
       setStep(3);
     } catch (err: any) {
+      console.error('Summary generation failed:', err);
+      console.error('Error details:', JSON.stringify(err, null, 2));
       if (err.message === "FETCH_FAIL") {
         setError("원문을 가져올 수 없어요. URL을 확인해주세요.");
       } else {
-        setError("요약 생성에 실패했어요. 다시 시도해주세요.");
+        setError(`요약 생성에 실패했어요: ${err.message}`);
       }
     } finally {
       setLoading(false);
