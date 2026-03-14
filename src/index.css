@@ -819,3 +819,15 @@
     max-width: 960px;
   }
 }
+
+/* Home content responsive */
+@media (min-width: 768px) {
+  .home-content {
+    padding: 36px 40px 80px;
+  }
+}
+@media (min-width: 1200px) {
+  .home-content {
+    padding: 44px 60px 80px;
+  }
+}
