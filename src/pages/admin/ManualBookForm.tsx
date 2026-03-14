@@ -56,6 +56,18 @@ interface Props {
   initialData?: ManualSummary | null;
 }
 
+function parseTagsFromText(text: string): string[] {
+  if (!text) return [];
+  const backtickMatches = text.match(/`([^`]+)`/g);
+  if (backtickMatches && backtickMatches.length > 0) {
+    return backtickMatches.map(t => t.replace(/`/g, '').trim()).filter(t => t.length > 0);
+  }
+  if (text.includes(',') || text.includes('，')) {
+    return text.split(/[,，]/).map(t => t.trim()).filter(t => t.length > 0);
+  }
+  return text.split(/\s+/).map(t => t.trim()).filter(t => t.length > 0);
+}
+
 function parseBulkText(text: string): Partial<ManualSummary> {
   const result: Partial<ManualSummary> = {};
   let filledSections = 0;
@@ -157,19 +169,13 @@ function parseBulkText(text: string): Partial<ManualSummary> {
   // 5. Tags
   const tagsKoBlock = extract(/태그\s*\(KO\)[^\n]*\n/i, /(?:태그\s*\(EN\)|Tags\s*\(EN\)|평점)/i);
   if (tagsKoBlock) {
-    const backtickTags = [...tagsKoBlock.matchAll(/`([^`]+)`/g)].map(m => m[1]);
-    result.tags_ko = backtickTags.length > 0
-      ? backtickTags
-      : tagsKoBlock.split(/[,，]/).map(t => t.trim()).filter(Boolean);
+    result.tags_ko = parseTagsFromText(tagsKoBlock);
     if (result.tags_ko.length > 0) filledSections++;
   }
 
   const tagsEnBlock = extract(/(?:태그\s*\(EN\)|Tags\s*\(EN\))[^\n]*\n/i, /(?:평점)/i);
   if (tagsEnBlock) {
-    const backtickTags = [...tagsEnBlock.matchAll(/`([^`]+)`/g)].map(m => m[1]);
-    result.tags_en = backtickTags.length > 0
-      ? backtickTags
-      : tagsEnBlock.split(/[,，]/).map(t => t.trim()).filter(Boolean);
+    result.tags_en = parseTagsFromText(tagsEnBlock);
     if (result.tags_en.length > 0) filledSections++;
   }
 
@@ -241,14 +247,16 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
   };
 
   const addTag = (lang: "ko" | "en") => {
-    if (lang === "ko" && newTagKo.trim()) {
-      update({ tags_ko: [...summary.tags_ko, newTagKo.trim()] });
-      setNewTagKo("");
+  const addTag = (lang: "ko" | "en") => {
+    const raw = lang === "ko" ? newTagKo : newTagEn;
+    if (!raw.trim()) return;
+    const parsed = parseTagsFromText(raw);
+    if (parsed.length > 0) {
+      const key = lang === "ko" ? "tags_ko" : "tags_en";
+      update({ [key]: [...summary[key], ...parsed] });
     }
-    if (lang === "en" && newTagEn.trim()) {
-      update({ tags_en: [...summary.tags_en, newTagEn.trim()] });
-      setNewTagEn("");
-    }
+    if (lang === "ko") setNewTagKo("");
+    else setNewTagEn("");
   };
 
   const handleBulkParse = () => {

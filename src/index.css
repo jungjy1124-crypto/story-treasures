@@ -1701,9 +1701,48 @@ select.admin-input { appearance: auto; }
   font-size: 14px;
 }
 
-
+.manual-chapter-card {
   padding: 0 !important;
   overflow: hidden;
+}
+
+.admin-book-info-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.admin-book-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.admin-book-info-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-book-info-label .admin-edit-link {
+  color: #c9a84c;
+  font-size: 11px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  opacity: 0.7;
+}
+.admin-book-info-label .admin-edit-link:hover {
+  opacity: 1;
+}
+.admin-book-info-value {
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
 }
 .manual-chapter-header {
   display: flex;

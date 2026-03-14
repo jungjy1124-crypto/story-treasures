@@ -376,12 +376,43 @@ ${excerpt}`,
 
       {/* Step 3 */}
       {step === 3 && summary && (
-        <AdminBookEditor
-          summary={summary}
-          onSummaryChange={setSummary}
-          onBack={() => { setSummary(null); setStep(2); }}
-          onSave={handleSave}
-        />
+        <div>
+          <div className="admin-book-info-card">
+            <div className="admin-book-info-item">
+              <span className="admin-book-info-label">제목 (KO) <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-value">{info.title_ko || "—"}</span>
+            </div>
+            <div className="admin-book-info-item">
+              <span className="admin-book-info-label">Title (EN) <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-value">{info.title_en || "—"}</span>
+            </div>
+            <div className="admin-book-info-item">
+              <span className="admin-book-info-label">저자 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-value">{info.author || "—"}</span>
+            </div>
+            <div className="admin-book-info-item">
+              <span className="admin-book-info-label">출판연도 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-value">{info.year || "—"}</span>
+            </div>
+            <div className="admin-book-info-item">
+              <span className="admin-book-info-label">페이지수 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-value">{info.pages || "—"}</span>
+            </div>
+            <div className="admin-book-info-item">
+              <span className="admin-book-info-label">커버 테마 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-value">
+                <span className={`admin-spine-preview ${info.cover_theme}`} style={{ display: "inline-block", width: 12, height: 12, borderRadius: "50%", marginRight: 6, verticalAlign: "middle" }} />
+                {THEMES.find(t => t.value === info.cover_theme)?.label || info.cover_theme}
+              </span>
+            </div>
+          </div>
+          <AdminBookEditor
+            summary={summary}
+            onSummaryChange={setSummary}
+            onBack={() => { setSummary(null); setStep(2); }}
+            onSave={handleSave}
+          />
+        </div>
       )}
     </div>
   );
