@@ -62,7 +62,7 @@ export default function AdminAddBook() {
   const [summary, setSummary] = useState<ReturnType<typeof createMockSummary> | null>(null);
 
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-  const allFilled = info.gutenberg_url && info.title_ko && info.title_en && info.author && info.year && info.pages;
+  const canProceed = !!info.gutenberg_url.trim();
 
   const handleGenerate = async () => {
     if (!apiKey) {
