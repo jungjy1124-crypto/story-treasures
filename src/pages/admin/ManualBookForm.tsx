@@ -24,6 +24,17 @@ export interface ManualSummary {
   rating: number;
 }
 
+export interface ParsedBookInfo {
+  title_ko?: string;
+  title_en?: string;
+  author?: string;
+  year?: string;
+  pages?: string;
+  cover_theme?: string;
+  tags_ko?: string[];
+  rating?: number;
+}
+
 function createEmptyChapter(num: number): Chapter {
   return { number: num, title_ko: "", title_en: "", quote_ko: "", quote_en: "", body_ko: "", body_en: "" };
 }
@@ -53,10 +64,11 @@ export function clearDraft() {
 interface Props {
   onBack: () => void;
   onNext: (summary: ManualSummary) => void;
+  onParsedInfo?: (info: ParsedBookInfo) => void;
   initialData?: ManualSummary | null;
 }
 
-function parseTagsFromText(text: string): string[] {
+export function parseTagsFromText(text: string): string[] {
   if (!text) return [];
   const backtickMatches = text.match(/`([^`]+)`/g);
   if (backtickMatches && backtickMatches.length > 0) {
@@ -68,11 +80,55 @@ function parseTagsFromText(text: string): string[] {
   return text.split(/\s+/).map(t => t.trim()).filter(t => t.length > 0);
 }
 
-function parseBulkText(text: string): Partial<ManualSummary> {
+const THEME_VALUES = ["theme-dark", "theme-crimson", "theme-navy", "theme-teal", "theme-purple", "theme-green"];
+
+function parseBasicInfo(text: string): ParsedBookInfo {
+  const info: ParsedBookInfo = {};
+  
+  const lineMatch = (pattern: RegExp): string => {
+    const m = text.match(pattern);
+    return m ? m[1].trim() : "";
+  };
+
+  const titleKo = lineMatch(/제목\s*(?:\(?\s*KO\s*\)?)?\s*[:：]\s*(.+)/i);
+  if (titleKo) info.title_ko = titleKo;
+
+  const titleEn = lineMatch(/(?:제목\s*\(?\s*EN\s*\)?|Title)\s*[:：]\s*(.+)/i);
+  if (titleEn) info.title_en = titleEn;
+
+  const author = lineMatch(/저자\s*[:：]\s*(.+)/i);
+  if (author) info.author = author;
+
+  const yearLine = lineMatch(/연도\s*[:：]\s*(.+)/i);
+  if (yearLine) {
+    const yearNum = yearLine.match(/(\d{4})/);
+    if (yearNum) info.year = yearNum[1];
+  }
+
+  const pagesLine = lineMatch(/페이지\s*(?:수)?\s*[:：]\s*(.+)/i);
+  if (pagesLine) {
+    const pNum = pagesLine.match(/(\d+)/);
+    if (pNum) info.pages = pNum[1];
+  }
+
+  const themeLine = lineMatch(/커버\s*(?:테마)?\s*[:：]\s*(.+)/i);
+  if (themeLine) {
+    const found = THEME_VALUES.find(v => themeLine.includes(v));
+    if (found) info.cover_theme = found;
+  }
+
+  const ratingMatch = text.match(/평점[^\d]*(\d+(?:\.\d+)?)/i) || text.match(/⭐\s*(\d+(?:\.\d+)?)/);
+  if (ratingMatch) {
+    info.rating = Math.min(5, Math.max(1, parseFloat(ratingMatch[1])));
+  }
+
+  return info;
+}
+
+function parseBulkText(text: string): Partial<ManualSummary> & { _filledCount?: number } {
   const result: Partial<ManualSummary> = {};
   let filledSections = 0;
 
-  // Helper: extract text between a start pattern and an end pattern (or end of string)
   const extract = (startPatterns: RegExp, endPatterns: RegExp | null): string => {
     for (const sp of [startPatterns]) {
       const match = text.match(sp);
@@ -111,7 +167,6 @@ function parseBulkText(text: string): Partial<ManualSummary> {
       const end = i + 1 < chapterPositions.length ? chapterPositions[i + 1].start : undefined;
       const block = end ? text.slice(start, end) : text.slice(start);
 
-      // Extract next section boundary within block
       const extractField = (patterns: RegExp[], endP: RegExp): string => {
         for (const p of patterns) {
           const m = block.match(p);
@@ -186,10 +241,10 @@ function parseBulkText(text: string): Partial<ManualSummary> {
     filledSections++;
   }
 
-  return { ...result, _filledCount: filledSections } as any;
+  return { ...result, _filledCount: filledSections };
 }
 
-export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
+export default function ManualBookForm({ onBack, onNext, onParsedInfo, initialData }: Props) {
   const [summary, setSummary] = useState<ManualSummary>(initialData || createEmptySummary());
   const [openChapter, setOpenChapter] = useState<number | null>(0);
   const [chapterLang, setChapterLang] = useState<Record<number, "ko" | "en">>({});
@@ -276,6 +331,15 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
       ...(parsed.tags_en ? { tags_en: parsed.tags_en } : {}),
       ...(parsed.rating ? { rating: parsed.rating } : {}),
     }));
+
+    // Extract basic info and notify parent
+    if (onParsedInfo) {
+      const basicInfo = parseBasicInfo(bulkText);
+      // Also pass tags and rating from content parsing if not found in basic info lines
+      if (!basicInfo.rating && parsed.rating) basicInfo.rating = parsed.rating;
+      if (!basicInfo.tags_ko && parsed.tags_ko) basicInfo.tags_ko = parsed.tags_ko;
+      onParsedInfo(basicInfo);
+    }
 
     setBulkOpen(false);
     setBulkMessage(`✅ ${filledCount}개 섹션이 자동으로 채워졌어요! 내용을 확인하고 수정해주세요.`);
@@ -498,4 +562,3 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
     </div>
   );
 }
-

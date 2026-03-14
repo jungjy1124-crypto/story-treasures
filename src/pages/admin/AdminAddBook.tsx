@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import AdminBookEditor from "./AdminBookEditor";
-import ManualBookForm, { loadDraft, clearDraft, type ManualSummary } from "./ManualBookForm";
+import ManualBookForm, { loadDraft, clearDraft, type ManualSummary, type ParsedBookInfo } from "./ManualBookForm";
 import { saveBook, type StoredBook } from "@/lib/bookStorage";
 
 const THEMES = [
@@ -44,6 +44,7 @@ export default function AdminAddBook() {
   const [showDraftBanner, setShowDraftBanner] = useState(false);
   const [draftData, setDraftData] = useState<ManualSummary | null>(null);
   const [manualInitial, setManualInitial] = useState<ManualSummary | null>(null);
+  const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
 
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
   const canProceed = !!info.gutenberg_url.trim();
@@ -61,13 +62,33 @@ export default function AdminAddBook() {
     setManualInitial(draftData);
     setShowDraftBanner(false);
     setMode("manual");
-    setStep(2);
+    setStep(1); // Content input is now Step 1
   };
 
   const handleNewStart = () => {
     clearDraft();
     setManualInitial(null);
     setShowDraftBanner(false);
+  };
+
+  const handleParsedInfo = (parsedInfo: ParsedBookInfo) => {
+    const filled = new Set<string>();
+    setInfo(prev => {
+      const updated = { ...prev };
+      if (parsedInfo.title_ko) { updated.title_ko = parsedInfo.title_ko; filled.add("title_ko"); }
+      if (parsedInfo.title_en) { updated.title_en = parsedInfo.title_en; filled.add("title_en"); }
+      if (parsedInfo.author) { updated.author = parsedInfo.author; filled.add("author"); }
+      if (parsedInfo.year) { updated.year = parsedInfo.year; filled.add("year"); }
+      if (parsedInfo.pages) { updated.pages = parsedInfo.pages; filled.add("pages"); }
+      if (parsedInfo.cover_theme) { updated.cover_theme = parsedInfo.cover_theme; filled.add("cover_theme"); }
+      return updated;
+    });
+    setAutoFilledFields(filled);
+  };
+
+  const handleManualNext = (manualSummary: ManualSummary) => {
+    setSummary(manualSummary);
+    setStep(2); // Basic info is now Step 2
   };
 
   const handleGenerate = async () => {
@@ -175,8 +196,7 @@ ${excerpt}`,
     }
   };
 
-  const handleManualNext = (manualSummary: ManualSummary) => {
-    setSummary(manualSummary);
+  const handleBasicInfoNext = () => {
     setStep(3);
   };
 
@@ -219,6 +239,9 @@ ${excerpt}`,
     navigate("/admin/books");
   };
 
+  const isAutoFilled = (field: string) => autoFilledFields.has(field);
+  const autoFieldClass = (field: string) => isAutoFilled(field) ? " admin-field-autofilled" : "";
+
   return (
     <div>
       <h1 className="admin-page-title">새 책 추가</h1>
@@ -236,70 +259,15 @@ ${excerpt}`,
 
       {/* Step indicator */}
       <div className="admin-steps">
-        <span className={`admin-step${step >= 1 ? " active" : ""}`}>① 기본 정보</span>
+        <span className={`admin-step${step >= 1 ? " active" : ""}`}>① 내용 입력</span>
         <span className="admin-step-arrow">→</span>
-        <span className={`admin-step${step >= 2 ? " active" : ""}`}>② {mode === "ai" ? "AI 요약 생성" : "내용 입력"}</span>
+        <span className={`admin-step${step >= 2 ? " active" : ""}`}>② 기본 정보</span>
         <span className="admin-step-arrow">→</span>
         <span className={`admin-step${step >= 3 ? " active" : ""}`}>③ 검토 및 저장</span>
       </div>
 
-      {/* Step 1 */}
+      {/* Step 1: Content input (was Step 2) */}
       {step === 1 && (
-        <div className="admin-card">
-          <div className="admin-form-grid">
-            <div className="admin-field full">
-              <label>Gutenberg URL</label>
-              <input
-                className="admin-input"
-                placeholder="https://www.gutenberg.org/files/2554/2554-0.txt"
-                value={info.gutenberg_url}
-                onChange={(e) => setInfo({ ...info, gutenberg_url: e.target.value })}
-              />
-            </div>
-            <div className="admin-field">
-              <label>제목 (한국어)</label>
-              <input className="admin-input" value={info.title_ko} onChange={(e) => setInfo({ ...info, title_ko: e.target.value })} />
-            </div>
-            <div className="admin-field">
-              <label>Title (English)</label>
-              <input className="admin-input" value={info.title_en} onChange={(e) => setInfo({ ...info, title_en: e.target.value })} />
-            </div>
-            <div className="admin-field">
-              <label>저자 / Author</label>
-              <input className="admin-input" value={info.author} onChange={(e) => setInfo({ ...info, author: e.target.value })} />
-            </div>
-            <div className="admin-field">
-              <label>출판연도 / Year</label>
-              <input className="admin-input" type="number" value={info.year} onChange={(e) => setInfo({ ...info, year: e.target.value })} />
-            </div>
-            <div className="admin-field">
-              <label>페이지수 / Pages</label>
-              <input className="admin-input" type="number" value={info.pages} onChange={(e) => setInfo({ ...info, pages: e.target.value })} />
-            </div>
-            <div className="admin-field">
-              <label>커버 테마</label>
-              <select
-                className="admin-input"
-                value={info.cover_theme}
-                onChange={(e) => setInfo({ ...info, cover_theme: e.target.value })}
-              >
-                {THEMES.map((t) => (
-                  <option key={t.value} value={t.value}>{t.value} — {t.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <button
-            className="admin-btn-primary"
-            onClick={() => setStep(2)}
-          >
-            다음 단계 →
-          </button>
-        </div>
-      )}
-
-      {/* Step 2 */}
-      {step === 2 && (
         <div>
           {/* Mode tabs */}
           <div className="manual-mode-tabs">
@@ -319,16 +287,22 @@ ${excerpt}`,
 
           {mode === "manual" ? (
             <ManualBookForm
-              onBack={() => setStep(1)}
+              onBack={() => navigate("/admin/books")}
               onNext={handleManualNext}
+              onParsedInfo={handleParsedInfo}
               initialData={manualInitial}
             />
           ) : (
-            /* AI mode - existing flow */
+            /* AI mode */
             <div className="admin-card admin-step2">
-              <div className="admin-step2-info">
-                <p><strong>{info.title_ko}</strong> / {info.title_en}</p>
-                <p>{info.author} · {info.year}</p>
+              <div className="admin-field full" style={{ marginBottom: 16 }}>
+                <label>Gutenberg URL</label>
+                <input
+                  className="admin-input"
+                  placeholder="https://www.gutenberg.org/files/2554/2554-0.txt"
+                  value={info.gutenberg_url}
+                  onChange={(e) => setInfo({ ...info, gutenberg_url: e.target.value })}
+                />
               </div>
 
               {!apiKey && (
@@ -366,40 +340,115 @@ ${excerpt}`,
                 </div>
               )}
 
-              <button className="admin-btn-secondary" onClick={() => setStep(1)}>
-                ← 이전 단계
+              <button className="admin-btn-secondary" onClick={() => navigate("/admin/books")}>
+                ← 돌아가기
               </button>
             </div>
           )}
         </div>
       )}
 
-      {/* Step 3 */}
+      {/* Step 2: Basic info (was Step 1) */}
+      {step === 2 && (
+        <div className="admin-card">
+          <div className="admin-form-grid">
+            <div className={`admin-field full${autoFieldClass("gutenberg_url")}`}>
+              <label>Gutenberg URL</label>
+              <input
+                className="admin-input"
+                placeholder="https://www.gutenberg.org/files/2554/2554-0.txt"
+                value={info.gutenberg_url}
+                onChange={(e) => { setInfo({ ...info, gutenberg_url: e.target.value }); setAutoFilledFields(prev => { const n = new Set(prev); n.delete("gutenberg_url"); return n; }); }}
+              />
+            </div>
+            <div className={`admin-field${autoFieldClass("title_ko")}`}>
+              <label>
+                제목 (한국어)
+                {isAutoFilled("title_ko") && <span className="admin-autofill-badge">자동입력됨</span>}
+              </label>
+              <input className="admin-input" value={info.title_ko} onChange={(e) => { setInfo({ ...info, title_ko: e.target.value }); setAutoFilledFields(prev => { const n = new Set(prev); n.delete("title_ko"); return n; }); }} />
+            </div>
+            <div className={`admin-field${autoFieldClass("title_en")}`}>
+              <label>
+                Title (English)
+                {isAutoFilled("title_en") && <span className="admin-autofill-badge">자동입력됨</span>}
+              </label>
+              <input className="admin-input" value={info.title_en} onChange={(e) => { setInfo({ ...info, title_en: e.target.value }); setAutoFilledFields(prev => { const n = new Set(prev); n.delete("title_en"); return n; }); }} />
+            </div>
+            <div className={`admin-field${autoFieldClass("author")}`}>
+              <label>
+                저자 / Author
+                {isAutoFilled("author") && <span className="admin-autofill-badge">자동입력됨</span>}
+              </label>
+              <input className="admin-input" value={info.author} onChange={(e) => { setInfo({ ...info, author: e.target.value }); setAutoFilledFields(prev => { const n = new Set(prev); n.delete("author"); return n; }); }} />
+            </div>
+            <div className={`admin-field${autoFieldClass("year")}`}>
+              <label>
+                출판연도 / Year
+                {isAutoFilled("year") && <span className="admin-autofill-badge">자동입력됨</span>}
+              </label>
+              <input className="admin-input" type="number" value={info.year} onChange={(e) => { setInfo({ ...info, year: e.target.value }); setAutoFilledFields(prev => { const n = new Set(prev); n.delete("year"); return n; }); }} />
+            </div>
+            <div className={`admin-field${autoFieldClass("pages")}`}>
+              <label>
+                페이지수 / Pages
+                {isAutoFilled("pages") && <span className="admin-autofill-badge">자동입력됨</span>}
+              </label>
+              <input className="admin-input" type="number" value={info.pages} onChange={(e) => { setInfo({ ...info, pages: e.target.value }); setAutoFilledFields(prev => { const n = new Set(prev); n.delete("pages"); return n; }); }} />
+            </div>
+            <div className={`admin-field${autoFieldClass("cover_theme")}`}>
+              <label>
+                커버 테마
+                {isAutoFilled("cover_theme") && <span className="admin-autofill-badge">자동입력됨</span>}
+              </label>
+              <select
+                className="admin-input"
+                value={info.cover_theme}
+                onChange={(e) => { setInfo({ ...info, cover_theme: e.target.value }); setAutoFilledFields(prev => { const n = new Set(prev); n.delete("cover_theme"); return n; }); }}
+              >
+                {THEMES.map((t) => (
+                  <option key={t.value} value={t.value}>{t.value} — {t.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="admin-editor-actions">
+            <button className="admin-btn-secondary" onClick={() => { setSummary(null); setStep(1); }}>
+              ← 이전 단계
+            </button>
+            <button className="admin-btn-primary" onClick={handleBasicInfoNext}>
+              다음 단계 →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Review and save */}
       {step === 3 && summary && (
         <div>
           <div className="admin-book-info-card">
             <div className="admin-book-info-item">
-              <span className="admin-book-info-label">제목 (KO) <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-label">제목 (KO) <button className="admin-edit-link" onClick={() => setStep(2)}>수정</button></span>
               <span className="admin-book-info-value">{info.title_ko || "—"}</span>
             </div>
             <div className="admin-book-info-item">
-              <span className="admin-book-info-label">Title (EN) <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-label">Title (EN) <button className="admin-edit-link" onClick={() => setStep(2)}>수정</button></span>
               <span className="admin-book-info-value">{info.title_en || "—"}</span>
             </div>
             <div className="admin-book-info-item">
-              <span className="admin-book-info-label">저자 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-label">저자 <button className="admin-edit-link" onClick={() => setStep(2)}>수정</button></span>
               <span className="admin-book-info-value">{info.author || "—"}</span>
             </div>
             <div className="admin-book-info-item">
-              <span className="admin-book-info-label">출판연도 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-label">출판연도 <button className="admin-edit-link" onClick={() => setStep(2)}>수정</button></span>
               <span className="admin-book-info-value">{info.year || "—"}</span>
             </div>
             <div className="admin-book-info-item">
-              <span className="admin-book-info-label">페이지수 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-label">페이지수 <button className="admin-edit-link" onClick={() => setStep(2)}>수정</button></span>
               <span className="admin-book-info-value">{info.pages || "—"}</span>
             </div>
             <div className="admin-book-info-item">
-              <span className="admin-book-info-label">커버 테마 <button className="admin-edit-link" onClick={() => setStep(1)}>수정</button></span>
+              <span className="admin-book-info-label">커버 테마 <button className="admin-edit-link" onClick={() => setStep(2)}>수정</button></span>
               <span className="admin-book-info-value">
                 <span className={`admin-spine-preview ${info.cover_theme}`} style={{ display: "inline-block", width: 12, height: 12, borderRadius: "50%", marginRight: 6, verticalAlign: "middle" }} />
                 {THEMES.find(t => t.value === info.cover_theme)?.label || info.cover_theme}
