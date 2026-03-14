@@ -149,7 +149,17 @@ ${excerpt}`,
       }
 
       const data = JSON.parse(responseText);
-      const parsed = JSON.parse(data.content[0].text);
+      let parsed;
+      try {
+        parsed = JSON.parse(data.content[0].text);
+        if (!parsed.intro || !parsed.chapters || parsed.chapters.length === 0) {
+          throw new Error('요약 데이터가 불완전해요. 다시 시도해주세요.');
+        }
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Raw response:', data.content[0].text);
+        throw new Error('요약 형식이 올바르지 않아요. 다시 시도해주세요.');
+      }
       // Auto-fill book info from AI response
       setInfo(prev => ({
         ...prev,
