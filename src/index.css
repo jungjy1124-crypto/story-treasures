@@ -582,10 +582,7 @@
   }
 
   .chaek-header {
-    padding: 18px 60px;
-  }
-  .logo {
-    font-size: 24px;
+    padding: 0 60px;
   }
 
   .hero-info {
@@ -660,40 +657,33 @@
   }
 
   /* Home page large desktop */
-  .home-books-row {
-    padding: 0 60px;
-    gap: 4px;
+  .hero-tagline {
+    padding: 64px 60px 40px;
   }
-  .home-spine {
-    height: 200px;
+  .tagline-main {
+    font-size: 48px;
   }
-  .home-spine-featured { width: 42px !important; }
-  .home-book-info {
-    padding: 28px 60px 32px;
-  }
-  .home-book-title {
-    font-size: 32px;
-  }
-  .home-cards-section {
-    padding: 40px 60px 0;
-  }
-  .home-section-title {
-    font-size: 28px;
-  }
-  .home-card-content {
-    padding: 20px 28px 24px;
-  }
-  .home-card-title {
-    font-size: 22px;
-  }
-  .home-ch-num {
-    font-size: 26px;
-  }
-  .home-ch-title {
-    font-size: 15px;
-  }
-  .home-ch-quote {
+  .tagline-desc {
     font-size: 14px;
-    padding: 12px 18px;
+    max-width: 400px;
+  }
+  .search-bar {
+    margin: 0 60px 28px;
+  }
+  .filter-row {
+    padding: 0 60px 28px;
+  }
+  .books-section {
+    padding: 0 60px 100px;
+  }
+  .books-grid {
+    gap: 16px;
+  }
+  .book-cover {
+    height: 160px;
+  }
+  .book-card.featured .book-cover {
+    width: 200px;
+    min-width: 200px;
   }
 }
