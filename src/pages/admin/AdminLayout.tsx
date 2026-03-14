@@ -29,6 +29,12 @@ export default function AdminLayout() {
       <div className="admin-body">
         {/* Sidebar (desktop) */}
         <nav className="admin-sidebar">
+          <button
+            className="admin-sidebar-home"
+            onClick={() => navigate("/")}
+          >
+            🏠 메인으로
+          </button>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.path}
