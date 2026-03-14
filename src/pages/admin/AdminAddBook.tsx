@@ -62,7 +62,7 @@ export default function AdminAddBook() {
   const [summary, setSummary] = useState<ReturnType<typeof createMockSummary> | null>(null);
 
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-  const allFilled = info.gutenberg_url && info.title_ko && info.title_en && info.author && info.year && info.pages;
+  const canProceed = !!info.gutenberg_url.trim();
 
   const handleGenerate = async () => {
     if (!apiKey) {
@@ -100,13 +100,16 @@ export default function AdminAddBook() {
           max_tokens: 4000,
           messages: [{
             role: "user",
-            content: `You are a literary editor for Chaekgado.
-Summarize this classic novel. Return ONLY valid JSON, no markdown.
-
-Book: ${info.title_en} by ${info.author}
+             content: `You are a literary editor for Chaekgado.
+Analyze this classic novel. Return ONLY valid JSON, no markdown.
 
 JSON format:
 {
+  "title_ko": "한국어 제목",
+  "title_en": "English Title",
+  "author": "Author Name",
+  "year": "Publication year (number as string)",
+  "pages": "Estimated page count (number as string)",
   "intro": "2-3 sentences about the author and interesting writing backstory",
   "chapters": [
     {
@@ -147,6 +150,15 @@ ${excerpt}`,
 
       const data = JSON.parse(responseText);
       const parsed = JSON.parse(data.content[0].text);
+      // Auto-fill book info from AI response
+      setInfo(prev => ({
+        ...prev,
+        title_ko: parsed.title_ko || prev.title_ko,
+        title_en: parsed.title_en || prev.title_en,
+        author: parsed.author || prev.author,
+        year: parsed.year || prev.year,
+        pages: parsed.pages || prev.pages,
+      }));
       setSummary(parsed);
       setStep(3);
     } catch (err: any) {
@@ -232,7 +244,7 @@ ${excerpt}`,
           </div>
           <button
             className="admin-btn-primary"
-            disabled={!allFilled}
+            disabled={!canProceed}
             onClick={() => setStep(2)}
           >
             다음 단계 →
