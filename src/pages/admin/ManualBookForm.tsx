@@ -247,7 +247,6 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
   };
 
   const addTag = (lang: "ko" | "en") => {
-  const addTag = (lang: "ko" | "en") => {
     const raw = lang === "ko" ? newTagKo : newTagEn;
     if (!raw.trim()) return;
     const parsed = parseTagsFromText(raw);
@@ -499,3 +498,4 @@ export default function ManualBookForm({ onBack, onNext, initialData }: Props) {
     </div>
   );
 }
+
