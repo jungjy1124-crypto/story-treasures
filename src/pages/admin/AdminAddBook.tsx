@@ -120,7 +120,7 @@ export default function AdminAddBook() {
           max_tokens: 8000,
           messages: [{
             role: "user",
-            content: `You are a literary editor for Chaekgado.
+            content: `You are a literary editor for Chaekga.
 Analyze this classic novel. Return ONLY valid JSON, no markdown.
 
 JSON format:

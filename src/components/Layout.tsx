@@ -37,7 +37,14 @@ const Layout = () => {
         <div className="chaek-header-inner">
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Link to={isKo ? "/ko" : "/en"} className="logo">
-              Chaek<span>gado</span>
+              {isKo ? (
+                <span style={{ fontFamily: "'Noto Serif KR', serif", fontWeight: 700 }}>책가</span>
+              ) : (
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1 }}>
+                  <span style={{ fontFamily: "'EB Garamond', serif", fontWeight: 700 }}>Chaekga</span>
+                  <span style={{ fontSize: 10, letterSpacing: "0.15em", color: "rgba(249,245,235,0.5)", fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}>classics, by your side</span>
+                </span>
+              )}
             </Link>
             {isAdmin && (
               <span className="admin-mode-badge">관리자 모드</span>
