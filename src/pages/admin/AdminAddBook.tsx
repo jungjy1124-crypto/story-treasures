@@ -200,7 +200,7 @@ ${excerpt}`,
     setStep(3);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!summary) return;
     const book: StoredBook = {
       id: crypto.randomUUID(),
@@ -230,13 +230,15 @@ ${excerpt}`,
       })),
       created_at: new Date().toISOString(),
     };
-    saveBook(book);
-    clearDraft();
-    toast({
-      title: "✅ 책이 추가됐어요!",
-      description: "책이 저장되었습니다",
-    });
-    navigate("/admin/books");
+    const result = await saveBook(book);
+    if (result.success) {
+      clearDraft();
+      toast({ title: "저장됐습니다 ✓" });
+      navigate("/admin/books");
+    } else {
+      console.error("Save failed:", result.error);
+      toast({ title: "저장 실패", variant: "destructive" });
+    }
   };
 
   const isAutoFilled = (field: string) => autoFilledFields.has(field);
