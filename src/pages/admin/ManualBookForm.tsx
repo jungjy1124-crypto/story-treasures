@@ -123,17 +123,9 @@ function parseBasicInfo(text: string): ParsedBookInfo {
     info.rating = Math.min(5, Math.max(1, parseFloat(ratingStr)));
   }
 
-  // Also parse tags for passing to parent
-  const tagsRaw = get('태그KO');
-  if (tagsRaw) {
-    let tags_ko: string[] = [];
-    if (tagsRaw.includes('`')) {
-      tags_ko = tagsRaw.match(/`([^`]+)`/g)?.map(t => t.replace(/`/g, '').trim()) ?? [];
-    } else if (tagsRaw.includes(',')) {
-      tags_ko = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
-    } else {
-      tags_ko = tagsRaw.split(/\s+/).filter(Boolean);
-    }
+  const tagsKoRaw = get('태그KO');
+  if (tagsKoRaw) {
+    const tags_ko = parseTagsFromText(tagsKoRaw);
     if (tags_ko.length > 0) info.tags_ko = tags_ko;
   }
 

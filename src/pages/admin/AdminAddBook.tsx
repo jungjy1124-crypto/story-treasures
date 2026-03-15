@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import AdminBookEditor from "./AdminBookEditor";
-import ManualBookForm, { loadDraft, clearDraft, type ManualSummary, type ParsedBookInfo } from "./ManualBookForm";
+import ManualBookForm, { loadDraft, clearDraft, parseTagsFromText, type ManualSummary, type ParsedBookInfo } from "./ManualBookForm";
 import { saveBook, type StoredBook } from "@/lib/bookStorage";
 
 const THEMES = [

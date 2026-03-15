@@ -10,7 +10,7 @@ interface EditState {
 const BookDetailPage = () => {
   const { slug } = useParams();
   const { pathname } = useLocation();
-  const isKo = pathname.startsWith("/ko");
+  const isKo = !pathname.startsWith("/en");
   const isAdmin = !!localStorage.getItem("cgAdmin");
 
   const [book, setBook] = useState<StoredBook | null>(null);
@@ -18,6 +18,7 @@ const BookDetailPage = () => {
   const [editing, setEditing] = useState<EditState>({});
   const [editValues, setEditValues] = useState<EditState>({});
   const [hasEdits, setHasEdits] = useState(false);
+  const [lang, setLang] = useState<"ko" | "en">("ko");
 
   useEffect(() => {
     if (slug) {
@@ -44,22 +45,20 @@ const BookDetailPage = () => {
     );
   }
 
+  // Helper: get field with EN fallback to KO
+  const t = (ko: string, en: string) => {
+    if (lang === "en") return en || ko;
+    return ko;
+  };
+
   const startEdit = (key: string, value: string) => {
     setEditing((prev) => ({ ...prev, [key]: value }));
     setEditValues((prev) => ({ ...prev, [key]: value }));
   };
 
   const cancelEdit = (key: string) => {
-    setEditing((prev) => {
-      const next = { ...prev };
-      delete next[key];
-      return next;
-    });
-    setEditValues((prev) => {
-      const next = { ...prev };
-      delete next[key];
-      return next;
-    });
+    setEditing((prev) => { const next = { ...prev }; delete next[key]; return next; });
+    setEditValues((prev) => { const next = { ...prev }; delete next[key]; return next; });
   };
 
   const confirmEdit = (key: string) => {
@@ -67,21 +66,21 @@ const BookDetailPage = () => {
     const updated = { ...book };
 
     if (key === "intro") {
-      if (isKo) updated.intro_ko = val; else updated.intro_en = val;
+      if (lang === "en") updated.intro_en = val; else updated.intro_ko = val;
     } else if (key === "closing") {
-      if (isKo) updated.closing_ko = val; else updated.closing_en = val;
+      if (lang === "en") updated.closing_en = val; else updated.closing_ko = val;
     } else if (key === "question") {
-      if (isKo) updated.question_ko = val; else updated.question_en = val;
+      if (lang === "en") updated.question_en = val; else updated.question_ko = val;
     } else if (key.startsWith("ch_quote_")) {
       const idx = parseInt(key.split("_")[2]);
       updated.chapters = [...updated.chapters];
       updated.chapters[idx] = { ...updated.chapters[idx] };
-      if (isKo) updated.chapters[idx].quote_ko = val; else updated.chapters[idx].quote_en = val;
+      if (lang === "en") updated.chapters[idx].quote_en = val; else updated.chapters[idx].quote_ko = val;
     } else if (key.startsWith("ch_body_")) {
       const idx = parseInt(key.split("_")[2]);
       updated.chapters = [...updated.chapters];
       updated.chapters[idx] = { ...updated.chapters[idx] };
-      if (isKo) updated.chapters[idx].body_ko = val; else updated.chapters[idx].body_en = val;
+      if (lang === "en") updated.chapters[idx].body_en = val; else updated.chapters[idx].body_ko = val;
     }
 
     setBook(updated);
@@ -101,11 +100,11 @@ const BookDetailPage = () => {
     }
   };
 
-  const intro = isKo ? book.intro_ko : book.intro_en;
-  const closing = isKo ? book.closing_ko : book.closing_en;
-  const question = isKo ? book.question_ko : book.question_en;
-  const tags = isKo ? book.tags_ko : book.tags_en;
-  const authorLabel = isKo ? "저자" : "by";
+  const intro = t(book.intro_ko, book.intro_en);
+  const closing = t(book.closing_ko, book.closing_en);
+  const question = t(book.question_ko, book.question_en);
+  const tags = lang === "en" && book.tags_en?.length ? book.tags_en : book.tags_ko;
+  const authorLabel = lang === "ko" ? "저자" : "by";
 
   const renderEditable = (key: string, content: string) => {
     if (editing[key] !== undefined) {
@@ -138,6 +137,44 @@ const BookDetailPage = () => {
 
   return (
     <>
+      {/* Language Toggle */}
+      <div style={{ display: "flex", justifyContent: "flex-end", padding: "16px 20px 0" }}>
+        <div style={{
+          display: "inline-flex",
+          borderRadius: 8,
+          overflow: "hidden",
+          border: "1px solid rgba(201,168,76,0.3)",
+        }}>
+          <button
+            onClick={() => setLang("ko")}
+            style={{
+              padding: "6px 16px",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              cursor: "pointer",
+              background: lang === "ko" ? "rgba(201,168,76,0.2)" : "transparent",
+              color: lang === "ko" ? "#c9a84c" : "rgba(255,255,255,0.5)",
+              transition: "all 0.2s",
+            }}
+          >KO</button>
+          <button
+            onClick={() => setLang("en")}
+            style={{
+              padding: "6px 16px",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              borderLeft: "1px solid rgba(201,168,76,0.3)",
+              cursor: "pointer",
+              background: lang === "en" ? "rgba(201,168,76,0.2)" : "transparent",
+              color: lang === "en" ? "#c9a84c" : "rgba(255,255,255,0.5)",
+              transition: "all 0.2s",
+            }}
+          >EN</button>
+        </div>
+      </div>
+
       {/* HERO */}
       <div className="book-detail-hero">
         <div className="shelf-scene">
@@ -147,7 +184,7 @@ const BookDetailPage = () => {
             <div className="book-spine b3"></div>
             <div className="book-spine b-main active">
               <div className="spine-inner"></div>
-              <div className="spine-text">{isKo ? book.title_ko : book.title_en}</div>
+              <div className="spine-text">{t(book.title_ko, book.title_en)}</div>
             </div>
             <div className="book-spine b5"></div>
             <div className="book-spine b6"></div>
@@ -158,7 +195,7 @@ const BookDetailPage = () => {
         </div>
         <div className="hero-info">
           <div className="hero-info-left">
-            <div className="book-title-hero">{isKo ? book.title_ko : book.title_en}</div>
+            <div className="book-title-hero">{t(book.title_ko, book.title_en)}</div>
             <div className="book-meta">
               {authorLabel} <strong>{book.author}</strong>
               <span className="sep">|</span> {book.year}
@@ -184,17 +221,17 @@ const BookDetailPage = () => {
       </div>
 
       {/* SECTION TITLE */}
-      <div className="section-header">{isKo ? "주요 요점" : "Key Points"}</div>
+      <div className="section-header">{lang === "ko" ? "주요 요점" : "Key Points"}</div>
 
       {/* CHAPTERS */}
       {book.chapters.map((ch, idx) => {
-        const quote = isKo ? ch.quote_ko : ch.quote_en;
-        const body = isKo ? ch.body_ko : ch.body_en;
+        const quote = t(ch.quote_ko, ch.quote_en);
+        const body = t(ch.body_ko, ch.body_en);
         return (
           <div key={ch.number} className="chapter-card">
             <div className="chapter-header">
               <div className="chapter-num">{ch.number}</div>
-              <div className="chapter-title">{isKo ? ch.title_ko : ch.title_en}</div>
+              <div className="chapter-title">{t(ch.title_ko, ch.title_en)}</div>
             </div>
             <div className="chapter-quote editable-section">
               {editButton(`ch_quote_${idx}`, quote)}
@@ -225,7 +262,7 @@ const BookDetailPage = () => {
           ? renderEditable("question", question)
           : (
             <>
-              <div className="question-label">{isKo ? "이 책을 읽고 난 뒤" : "After reading this book"}</div>
+              <div className="question-label">{lang === "ko" ? "이 책을 읽고 난 뒤" : "After reading this book"}</div>
               <div className="question-text">{question}</div>
             </>
           )}
