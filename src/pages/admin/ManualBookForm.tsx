@@ -84,42 +84,57 @@ const THEME_VALUES = ["theme-dark", "theme-crimson", "theme-navy", "theme-teal",
 
 function parseBasicInfo(text: string): ParsedBookInfo {
   const info: ParsedBookInfo = {};
-  
-  const lineMatch = (pattern: RegExp): string => {
-    const m = text.match(pattern);
-    return m ? m[1].trim() : "";
+
+  const get = (key: string): string => {
+    const regex = new RegExp(`^${key}:\\s*(.+)$`, 'm');
+    const match = text.match(regex);
+    return match ? match[1].trim() : '';
   };
 
-  const titleKo = lineMatch(/제목\s*(?:\(?\s*KO\s*\)?)?\s*[:：]\s*(.+)/i);
+  const titleKo = get('제목KO');
   if (titleKo) info.title_ko = titleKo;
 
-  const titleEn = lineMatch(/(?:제목\s*\(?\s*EN\s*\)?|Title)\s*[:：]\s*(.+)/i);
+  const titleEn = get('제목EN');
   if (titleEn) info.title_en = titleEn;
 
-  const author = lineMatch(/저자\s*[:：]\s*(.+)/i);
+  const author = get('저자');
   if (author) info.author = author;
 
-  const yearLine = lineMatch(/연도\s*[:：]\s*(.+)/i);
-  if (yearLine) {
-    const yearNum = yearLine.match(/(\d{4})/);
+  const yearStr = get('연도');
+  if (yearStr) {
+    const yearNum = yearStr.match(/(\d{4})/);
     if (yearNum) info.year = yearNum[1];
   }
 
-  const pagesLine = lineMatch(/페이지\s*(?:수)?\s*[:：]\s*(.+)/i);
-  if (pagesLine) {
-    const pNum = pagesLine.match(/(\d+)/);
+  const pagesStr = get('페이지수');
+  if (pagesStr) {
+    const pNum = pagesStr.match(/(\d+)/);
     if (pNum) info.pages = pNum[1];
   }
 
-  const themeLine = lineMatch(/커버\s*(?:테마)?\s*[:：]\s*(.+)/i);
-  if (themeLine) {
-    const found = THEME_VALUES.find(v => themeLine.includes(v));
+  const theme = get('커버테마');
+  if (theme) {
+    const found = THEME_VALUES.find(v => theme.includes(v));
     if (found) info.cover_theme = found;
   }
 
-  const ratingMatch = text.match(/평점[^\d]*(\d+(?:\.\d+)?)/i) || text.match(/⭐\s*(\d+(?:\.\d+)?)/);
-  if (ratingMatch) {
-    info.rating = Math.min(5, Math.max(1, parseFloat(ratingMatch[1])));
+  const ratingStr = get('평점');
+  if (ratingStr) {
+    info.rating = Math.min(5, Math.max(1, parseFloat(ratingStr)));
+  }
+
+  // Also parse tags for passing to parent
+  const tagsRaw = get('태그KO');
+  if (tagsRaw) {
+    let tags_ko: string[] = [];
+    if (tagsRaw.includes('`')) {
+      tags_ko = tagsRaw.match(/`([^`]+)`/g)?.map(t => t.replace(/`/g, '').trim()) ?? [];
+    } else if (tagsRaw.includes(',')) {
+      tags_ko = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+    } else {
+      tags_ko = tagsRaw.split(/\s+/).filter(Boolean);
+    }
+    if (tags_ko.length > 0) info.tags_ko = tags_ko;
   }
 
   return info;
