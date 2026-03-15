@@ -53,10 +53,10 @@ const BookDetailPage = () => {
     );
   }
 
-  // Helper: get field with EN fallback to KO
-  const t = (ko: string, en: string) => {
-    if (lang === "en") return en || ko;
-    return ko;
+  // Helper: get field with EN fallback to KO (empty string = missing)
+  const t = (ko: string | undefined, en: string | undefined) => {
+    if (lang === "en" && en && en.trim() !== "") return en;
+    return ko || "";
   };
 
   const startEdit = (key: string, value: string) => {
