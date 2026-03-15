@@ -34,17 +34,13 @@ const BookDetailPage = () => {
           console.log("closing_en:", found.closing_en);
           console.log("question_en:", found.question_en);
           console.log("chapters sample:", JSON.stringify(found.chapters?.[0]));
-          console.log("lang state:", lang);
+          console.log("lang state:", pathname.startsWith("/en") ? "en" : "ko");
           setBook(found);
         }
         setLoading(false);
       });
     }
-  }, [slug]);
-
-  useEffect(() => {
-    console.log("lang state:", lang);
-  }, [lang]);
+  }, [slug, pathname]);
 
   if (loading) {
     return (
