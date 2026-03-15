@@ -123,17 +123,9 @@ function parseBasicInfo(text: string): ParsedBookInfo {
     info.rating = Math.min(5, Math.max(1, parseFloat(ratingStr)));
   }
 
-  // Also parse tags for passing to parent
-  const tagsRaw = get('태그KO');
-  if (tagsRaw) {
-    let tags_ko: string[] = [];
-    if (tagsRaw.includes('`')) {
-      tags_ko = tagsRaw.match(/`([^`]+)`/g)?.map(t => t.replace(/`/g, '').trim()) ?? [];
-    } else if (tagsRaw.includes(',')) {
-      tags_ko = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
-    } else {
-      tags_ko = tagsRaw.split(/\s+/).filter(Boolean);
-    }
+  const tagsKoRaw = get('태그KO');
+  if (tagsKoRaw) {
+    const tags_ko = parseTagsFromText(tagsKoRaw);
     if (tags_ko.length > 0) info.tags_ko = tags_ko;
   }
 
@@ -151,25 +143,27 @@ function parseBulkText(text: string): Partial<ManualSummary> & { _filledCount?: 
   let filledSections = 0;
 
   // Intro
-  const intro = get('작가소개KO');
-  if (intro) { result.intro = intro; filledSections++; }
+  const introKo = get('작가소개KO');
+  if (introKo) { result.intro = introKo; filledSections++; }
+
+  // Intro EN (stored separately for passing to parent if needed)
+  const introEn = get('작가소개EN');
 
   // Parse chapters dynamically
   const chapters: Chapter[] = [];
   const chapterNumbers: number[] = [];
-  const titleMatches = text.matchAll(/^챕터(\d+)제목KO:/gm);
-  for (const match of titleMatches) {
+  for (const match of text.matchAll(/^챕터(\d+)제목KO:/gm)) {
     chapterNumbers.push(parseInt(match[1]));
   }
   for (const num of chapterNumbers) {
     chapters.push({
       number: num,
       title_ko: get(`챕터${num}제목KO`),
-      title_en: '',
+      title_en: get(`챕터${num}제목EN`),
       quote_ko: get(`챕터${num}인용KO`),
-      quote_en: '',
+      quote_en: get(`챕터${num}인용EN`),
       body_ko: get(`챕터${num}본문KO`),
-      body_en: '',
+      body_en: get(`챕터${num}본문EN`),
     });
   }
   if (chapters.length > 0) { result.chapters = chapters; filledSections++; }
@@ -177,23 +171,25 @@ function parseBulkText(text: string): Partial<ManualSummary> & { _filledCount?: 
   // Closing
   const closingKo = get('마무리KO');
   if (closingKo) { result.closing_ko = closingKo; filledSections++; }
+  const closingEn = get('마무리EN');
+  if (closingEn) { result.closing_en = closingEn; }
 
   // Question
   const questionKo = get('질문KO');
   if (questionKo) { result.question_ko = questionKo; filledSections++; }
+  const questionEn = get('질문EN');
+  if (questionEn) { result.question_en = questionEn; }
 
   // Tags
-  const tagsRaw = get('태그KO');
-  if (tagsRaw) {
-    let tags_ko: string[] = [];
-    if (tagsRaw.includes('`')) {
-      tags_ko = tagsRaw.match(/`([^`]+)`/g)?.map(t => t.replace(/`/g, '').trim()) ?? [];
-    } else if (tagsRaw.includes(',')) {
-      tags_ko = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
-    } else {
-      tags_ko = tagsRaw.split(/\s+/).filter(Boolean);
-    }
+  const tagsKoRaw = get('태그KO');
+  if (tagsKoRaw) {
+    const tags_ko = parseTagsFromText(tagsKoRaw);
     if (tags_ko.length > 0) { result.tags_ko = tags_ko; filledSections++; }
+  }
+  const tagsEnRaw = get('태그EN');
+  if (tagsEnRaw) {
+    const tags_en = parseTagsFromText(tagsEnRaw);
+    if (tags_en.length > 0) { result.tags_en = tags_en; }
   }
 
   // Rating

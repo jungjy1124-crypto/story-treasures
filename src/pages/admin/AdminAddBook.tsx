@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import AdminBookEditor from "./AdminBookEditor";
-import ManualBookForm, { loadDraft, clearDraft, type ManualSummary, type ParsedBookInfo } from "./ManualBookForm";
+import ManualBookForm, { loadDraft, clearDraft, parseTagsFromText, type ManualSummary, type ParsedBookInfo } from "./ManualBookForm";
 import { saveBook, type StoredBook } from "@/lib/bookStorage";
 
 const THEMES = [
@@ -91,6 +91,51 @@ export default function AdminAddBook() {
     setStep(2); // Basic info is now Step 2
   };
 
+  const buildPrompt = (bookInfo: BookInfo): string => {
+    return `You are a book summary writer for Chaekga (책가), a Korean classic literature summary site.
+Write a bilingual summary for the following book.
+Return ONLY a JSON object with no markdown, no preamble, no explanation.
+
+Book info:
+- Title: ${bookInfo.title_en || bookInfo.title_ko}
+- Author: ${bookInfo.author}
+- Year: ${bookInfo.year}
+
+The summary must follow this EXACT JSON structure:
+{
+  "intro_ko": "작가에 대한 흥미로운 사실 2~3문장. 출판 비화, 집필 배경 등.",
+  "intro_en": "2-3 sentences about the author. Publication story, writing background.",
+  "chapters": [
+    {
+      "number": 1,
+      "title_ko": "챕터 주제 (한글 / English)",
+      "title_en": "Chapter Theme Title",
+      "quote_ko": "이 챕터를 대표하는 인상적인 한 문단. 소설 속 장면이나 분위기를 살린 문장.",
+      "quote_en": "A vivid representative passage capturing the mood of this chapter.",
+      "body_ko": "이 챕터의 핵심 사건과 의미를 3~4문장으로 요약.",
+      "body_en": "3-4 sentences summarizing the key events and significance of this chapter."
+    }
+  ],
+  "closing_ko": "이 책의 문학적 의의와 작가가 전달하려 한 메시지. 2~3문장.",
+  "closing_en": "Literary significance and the author's core message. 2-3 sentences.",
+  "question_ko": "독자에게 던지는 질문. 삶과 연결되는 깊은 질문 한 문장.",
+  "question_en": "A single deep question for the reader connecting the book to life.",
+  "tags_ko": "태그1 태그2 태그3 태그4 태그5",
+  "tags_en": "tag1 tag2 tag3 tag4 tag5",
+  "rating": 4.3
+}
+
+Rules:
+- chapters array must have 5 to 6 items
+- All KO text must be in Korean (한국어)
+- All EN text must be in English
+- quote fields should feel literary and evocative, NOT just plot description
+- body fields should include both plot summary AND thematic significance
+- tags should be single words or short phrases, space-separated (NOT comma-separated)
+- rating is a float between 3.5 and 5.0
+- Return ONLY the JSON object. No other text.`;
+  };
+
   const handleGenerate = async () => {
     if (!apiKey) {
       setError("API 키가 설정되지 않았어요. 관리자에게 문의하세요.");
@@ -99,13 +144,6 @@ export default function AdminAddBook() {
     setLoading(true);
     setError("");
     try {
-      setLoadingMsg("원문을 불러오는 중...");
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(info.gutenberg_url)}`;
-      const textRes = await fetch(proxyUrl);
-      if (!textRes.ok) throw new Error("FETCH_FAIL");
-      const fullText = await textRes.text();
-      const excerpt = fullText.slice(0, 30000);
-
       setLoadingMsg("AI가 요약을 생성하고 있어요... (30-60초 소요)");
       const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -116,46 +154,9 @@ export default function AdminAddBook() {
           "anthropic-dangerous-direct-browser-access": "true",
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-5",
           max_tokens: 8000,
-          messages: [{
-            role: "user",
-            content: `You are a literary editor for Chaekga.
-Analyze this classic novel. Return ONLY valid JSON, no markdown.
-
-JSON format:
-{
-  "title_ko": "한국어 제목",
-  "title_en": "English Title",
-  "author": "Author Name",
-  "year": "Publication year (number as string)",
-  "pages": "Estimated page count (number as string)",
-  "intro": "2-3 sentences about the author and interesting writing backstory",
-  "chapters": [
-    {
-      "number": 1,
-      "title_ko": "챕터 제목",
-      "title_en": "Chapter Title",
-      "quote_ko": "핵심 장면 2-3문장. 문학적 문체로.",
-      "quote_en": "Same scene in English, literary style.",
-      "body_ko": "2-3 paragraphs in Korean",
-      "body_en": "2-3 paragraphs in English"
-    }
-  ],
-  "closing_ko": "3단락 마무리 분석",
-  "closing_en": "3 paragraph closing analysis",
-  "question_ko": "독자를 향한 성찰적 질문 2문장",
-  "question_en": "Reflective question for readers",
-  "tags_ko": ["태그1", "태그2", "태그3", "태그4"],
-  "tags_en": ["tag1", "tag2", "tag3", "tag4"],
-  "rating": 4.2
-}
-
-Generate exactly 6 chapters. Warm literary tone.
-
-Novel excerpt:
-${excerpt}`,
-          }],
+          messages: [{ role: "user", content: buildPrompt(info) }],
         }),
       });
 
@@ -165,15 +166,14 @@ ${excerpt}`,
         return;
       }
       const data = JSON.parse(responseText);
-      let parsed;
-      try {
-        parsed = JSON.parse(data.content[0].text);
-        if (!parsed.intro || !parsed.chapters || parsed.chapters.length === 0) {
-          throw new Error('요약 데이터가 불완전해요.');
-        }
-      } catch (parseError) {
-        throw new Error('요약 형식이 올바르지 않아요. 다시 시도해주세요.');
+      const raw = data.content[0].text;
+      const clean = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const parsed = JSON.parse(clean);
+
+      if (!parsed.chapters || parsed.chapters.length === 0) {
+        throw new Error('요약 데이터가 불완전해요.');
       }
+
       setInfo(prev => ({
         ...prev,
         title_ko: parsed.title_ko || prev.title_ko,
@@ -182,14 +182,41 @@ ${excerpt}`,
         year: parsed.year || prev.year,
         pages: parsed.pages || prev.pages,
       }));
-      setSummary(parsed);
+
+      // Set auto-filled fields for Step 2 badges
+      const filled = new Set<string>();
+      if (parsed.title_ko) filled.add("title_ko");
+      if (parsed.title_en) filled.add("title_en");
+      if (parsed.author) filled.add("author");
+      if (parsed.year) filled.add("year");
+      if (parsed.pages) filled.add("pages");
+      setAutoFilledFields(filled);
+
+      setSummary({
+        intro: parsed.intro_ko || '',
+        intro_en: parsed.intro_en || '',
+        chapters: (parsed.chapters || []).map((ch: any) => ({
+          number: ch.number,
+          title_ko: ch.title_ko || '',
+          title_en: ch.title_en || '',
+          quote_ko: ch.quote_ko || '',
+          quote_en: ch.quote_en || '',
+          body_ko: ch.body_ko || '',
+          body_en: ch.body_en || '',
+        })),
+        closing_ko: parsed.closing_ko || '',
+        closing_en: parsed.closing_en || '',
+        question_ko: parsed.question_ko || '',
+        question_en: parsed.question_en || '',
+        tags_ko: parseTagsFromText(typeof parsed.tags_ko === 'string' ? parsed.tags_ko : (parsed.tags_ko || []).join(' ')),
+        tags_en: parseTagsFromText(typeof parsed.tags_en === 'string' ? parsed.tags_en : (parsed.tags_en || []).join(' ')),
+        rating: parsed.rating || 4.0,
+      });
       setStep(3);
     } catch (err: any) {
-      if (err.message === "FETCH_FAIL") {
-        setError("원문을 가져올 수 없어요. URL을 확인해주세요.");
-      } else {
-        setError(`요약 생성에 실패했어요: ${err.message}`);
-      }
+      console.error("AI generation error:", err);
+      setError("AI 생성 실패 — 직접입력 탭을 이용해주세요");
+      toast({ title: "AI 생성 실패 — 직접입력 탭을 이용해주세요", variant: "destructive" });
     } finally {
       setLoading(false);
       setLoadingMsg("");
