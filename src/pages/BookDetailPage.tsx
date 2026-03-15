@@ -162,8 +162,8 @@ const BookDetailPage = () => {
               fontWeight: 600,
               border: "none",
               cursor: "pointer",
-              background: lang === "ko" ? "rgba(201,168,76,0.2)" : "transparent",
-              color: lang === "ko" ? "#c9a84c" : "rgba(255,255,255,0.5)",
+              background: lang === "ko" ? "#c9a84c" : "transparent",
+              color: lang === "ko" ? "#1a1a1a" : "#c9a84c",
               transition: "all 0.2s",
             }}
           >KO</button>
@@ -176,8 +176,8 @@ const BookDetailPage = () => {
               border: "none",
               borderLeft: "1px solid rgba(201,168,76,0.3)",
               cursor: "pointer",
-              background: lang === "en" ? "rgba(201,168,76,0.2)" : "transparent",
-              color: lang === "en" ? "#c9a84c" : "rgba(255,255,255,0.5)",
+              background: lang === "en" ? "#c9a84c" : "transparent",
+              color: lang === "en" ? "#1a1a1a" : "#c9a84c",
               transition: "all 0.2s",
             }}
           >EN</button>
