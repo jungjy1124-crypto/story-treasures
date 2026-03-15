@@ -13,6 +13,15 @@ export default function AdminLayout() {
   const { isAuthenticated, checking, logout } = useAdminAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    supabase
+      .from("user_passages")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending")
+      .then(({ count }) => setPendingCount(count || 0));
+  }, [location.pathname]);
 
   if (checking) return <div className="admin-loading">로딩 중...</div>;
   if (!isAuthenticated) return null;
