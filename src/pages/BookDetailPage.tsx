@@ -126,9 +126,9 @@ const BookDetailPage = () => {
     }
   };
 
-  const intro = t(book.intro_ko, book.intro_en);
-  const closing = t(book.closing_ko, book.closing_en);
-  const question = t(book.question_ko, book.question_en);
+  const intro = getField(book as unknown as Record<string, unknown>, "intro_en", "intro_ko");
+  const closing = getField(book as unknown as Record<string, unknown>, "closing_en", "closing_ko");
+  const question = getField(book as unknown as Record<string, unknown>, "question_en", "question_ko");
   const tags = lang === "en" && book.tags_en?.length ? book.tags_en : book.tags_ko;
   const authorLabel = lang === "ko" ? "저자" : "by";
 
