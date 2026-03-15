@@ -90,6 +90,17 @@ export default function AdminLayout() {
             onClick={() => navigate(item.path)}
           >
             {item.label}
+            {item.hasBadge && pendingCount > 0 && (
+              <span style={{
+                background: "#e53e3e",
+                color: "#fff",
+                borderRadius: 10,
+                padding: "1px 6px",
+                fontSize: 10,
+                fontWeight: 700,
+                marginLeft: 4,
+              }}>{pendingCount}</span>
+            )}
           </button>
         ))}
         <button className="admin-bottom-item" onClick={logout}>
