@@ -281,23 +281,26 @@ export default function ManualBookForm({ onBack, onNext, onParsedInfo, initialDa
     const filledCount = parsed._filledCount || 0;
     delete parsed._filledCount;
     
-    setSummary(prev => ({
-      ...prev,
-      ...(parsed.intro ? { intro: parsed.intro } : {}),
-      ...(parsed.chapters ? { chapters: parsed.chapters } : {}),
-      ...(parsed.closing_ko ? { closing_ko: parsed.closing_ko } : {}),
-      ...(parsed.closing_en ? { closing_en: parsed.closing_en } : {}),
-      ...(parsed.question_ko ? { question_ko: parsed.question_ko } : {}),
-      ...(parsed.question_en ? { question_en: parsed.question_en } : {}),
-      ...(parsed.tags_ko ? { tags_ko: parsed.tags_ko } : {}),
-      ...(parsed.tags_en ? { tags_en: parsed.tags_en } : {}),
-      ...(parsed.rating ? { rating: parsed.rating } : {}),
-    }));
+    // Fully replace state — do NOT merge with previous chapters
+    setSummary(() => {
+      const fresh = createEmptySummary();
+      return {
+        ...fresh,
+        ...(parsed.intro ? { intro: parsed.intro } : {}),
+        ...(parsed.chapters ? { chapters: parsed.chapters } : { chapters: fresh.chapters }),
+        ...(parsed.closing_ko ? { closing_ko: parsed.closing_ko } : {}),
+        ...(parsed.closing_en ? { closing_en: parsed.closing_en } : {}),
+        ...(parsed.question_ko ? { question_ko: parsed.question_ko } : {}),
+        ...(parsed.question_en ? { question_en: parsed.question_en } : {}),
+        ...(parsed.tags_ko ? { tags_ko: parsed.tags_ko } : {}),
+        ...(parsed.tags_en ? { tags_en: parsed.tags_en } : {}),
+        ...(parsed.rating ? { rating: parsed.rating } : {}),
+      };
+    });
 
     // Extract basic info and notify parent
     if (onParsedInfo) {
       const basicInfo = parseBasicInfo(bulkText);
-      // Also pass tags and rating from content parsing if not found in basic info lines
       if (!basicInfo.rating && parsed.rating) basicInfo.rating = parsed.rating;
       if (!basicInfo.tags_ko && parsed.tags_ko) basicInfo.tags_ko = parsed.tags_ko;
       onParsedInfo(basicInfo);
