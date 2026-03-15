@@ -1,15 +1,27 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const NAV_ITEMS = [
   { label: "📚 책 목록", path: "/admin/books" },
   { label: "➕ 새 책 추가", path: "/admin/add" },
+  { label: "✏️ 구절 승인", path: "/admin/passages", hasBadge: true },
 ];
 
 export default function AdminLayout() {
   const { isAuthenticated, checking, logout } = useAdminAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    supabase
+      .from("user_passages")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending")
+      .then(({ count }) => setPendingCount(count || 0));
+  }, [location.pathname]);
 
   if (checking) return <div className="admin-loading">로딩 중...</div>;
   if (!isAuthenticated) return null;
@@ -42,6 +54,17 @@ export default function AdminLayout() {
               onClick={() => navigate(item.path)}
             >
               {item.label}
+              {item.hasBadge && pendingCount > 0 && (
+                <span style={{
+                  background: "#e53e3e",
+                  color: "#fff",
+                  borderRadius: 10,
+                  padding: "1px 7px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  marginLeft: 6,
+                }}>{pendingCount}</span>
+              )}
             </button>
           ))}
           <button className="admin-sidebar-item logout" onClick={logout}>
@@ -67,6 +90,17 @@ export default function AdminLayout() {
             onClick={() => navigate(item.path)}
           >
             {item.label}
+            {item.hasBadge && pendingCount > 0 && (
+              <span style={{
+                background: "#e53e3e",
+                color: "#fff",
+                borderRadius: 10,
+                padding: "1px 6px",
+                fontSize: 10,
+                fontWeight: 700,
+                marginLeft: 4,
+              }}>{pendingCount}</span>
+            )}
           </button>
         ))}
         <button className="admin-bottom-item" onClick={logout}>

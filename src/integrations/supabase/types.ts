@@ -112,6 +112,44 @@ export type Database = {
           },
         ]
       }
+      user_passages: {
+        Row: {
+          book_id: string
+          chapter: number | null
+          content: string
+          created_at: string | null
+          id: string
+          nickname: string
+          status: string
+        }
+        Insert: {
+          book_id: string
+          chapter?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          nickname: string
+          status?: string
+        }
+        Update: {
+          book_id?: string
+          chapter?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          nickname?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_passages_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

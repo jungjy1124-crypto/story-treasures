@@ -4,6 +4,7 @@ import { getBookById, saveBook, type StoredBook } from "@/lib/bookStorage";
 import { toast } from "@/hooks/use-toast";
 import KeyPassagesEditor, { type KeyPassage } from "@/components/KeyPassagesEditor";
 import CommentSection from "@/components/CommentSection";
+import UserPassageSection from "@/components/UserPassageSection";
 
 interface EditState {
   [key: string]: string;
@@ -293,6 +294,9 @@ const BookDetailPage = () => {
             </>
           )}
       </div>
+
+      {/* User Passages */}
+      {book && <UserPassageSection bookId={book.id} />}
 
       {/* Comment Section */}
       {book && <CommentSection bookId={book.id} />}
