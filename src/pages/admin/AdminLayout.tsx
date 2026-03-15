@@ -1,9 +1,12 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const NAV_ITEMS = [
   { label: "📚 책 목록", path: "/admin/books" },
   { label: "➕ 새 책 추가", path: "/admin/add" },
+  { label: "✏️ 구절 승인", path: "/admin/passages", hasBadge: true },
 ];
 
 export default function AdminLayout() {

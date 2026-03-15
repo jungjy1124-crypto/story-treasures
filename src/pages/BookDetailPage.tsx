@@ -295,6 +295,9 @@ const BookDetailPage = () => {
           )}
       </div>
 
+      {/* User Passages */}
+      {book && <UserPassageSection bookId={book.id} />}
+
       {/* Comment Section */}
       {book && <CommentSection bookId={book.id} />}
 
