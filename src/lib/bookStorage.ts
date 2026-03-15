@@ -68,7 +68,12 @@ export async function getBooks(): Promise<StoredBook[]> {
 export async function getBookById(id: string): Promise<StoredBook | undefined> {
   const { data, error } = await supabase
     .from("books")
-    .select("*")
+    .select(`
+      id, title_ko, title_en, author, year, pages, cover_theme,
+      rating, intro_ko, intro_en, closing_ko, closing_en,
+      question_ko, question_en, tags_ko, tags_en,
+      chapters, key_passages, created_at
+    `)
     .eq("id", id)
     .maybeSingle();
   if (error || !data) {

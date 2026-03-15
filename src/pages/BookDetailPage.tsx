@@ -24,7 +24,14 @@ const BookDetailPage = () => {
   useEffect(() => {
     if (slug) {
       getBookById(slug).then((found) => {
-        if (found) setBook(found);
+        if (found) {
+          console.log('=== BOOK EN DEBUG ===');
+          console.log('intro_en:', found.intro_en);
+          console.log('closing_en:', found.closing_en);
+          console.log('question_en:', found.question_en);
+          console.log('chapters sample:', JSON.stringify(found.chapters?.[0]));
+          setBook(found);
+        }
         setLoading(false);
       });
     }
@@ -46,10 +53,10 @@ const BookDetailPage = () => {
     );
   }
 
-  // Helper: get field with EN fallback to KO
-  const t = (ko: string, en: string) => {
-    if (lang === "en") return en || ko;
-    return ko;
+  // Helper: get field with EN fallback to KO (empty string = missing)
+  const t = (ko: string | undefined, en: string | undefined) => {
+    if (lang === "en" && en && en.trim() !== "") return en;
+    return ko || "";
   };
 
   const startEdit = (key: string, value: string) => {
