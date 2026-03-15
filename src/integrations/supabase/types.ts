@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      books: {
+        Row: {
+          author: string | null
+          chapters: Json | null
+          closing_ko: string | null
+          cover_theme: string | null
+          created_at: string | null
+          id: string
+          intro_ko: string | null
+          pages: number | null
+          question_ko: string | null
+          rating: number | null
+          tags_ko: string[] | null
+          title_en: string | null
+          title_ko: string
+          year: number | null
+        }
+        Insert: {
+          author?: string | null
+          chapters?: Json | null
+          closing_ko?: string | null
+          cover_theme?: string | null
+          created_at?: string | null
+          id?: string
+          intro_ko?: string | null
+          pages?: number | null
+          question_ko?: string | null
+          rating?: number | null
+          tags_ko?: string[] | null
+          title_en?: string | null
+          title_ko: string
+          year?: number | null
+        }
+        Update: {
+          author?: string | null
+          chapters?: Json | null
+          closing_ko?: string | null
+          cover_theme?: string | null
+          created_at?: string | null
+          id?: string
+          intro_ko?: string | null
+          pages?: number | null
+          question_ko?: string | null
+          rating?: number | null
+          tags_ko?: string[] | null
+          title_en?: string | null
+          title_ko?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
