@@ -84,161 +84,123 @@ const THEME_VALUES = ["theme-dark", "theme-crimson", "theme-navy", "theme-teal",
 
 function parseBasicInfo(text: string): ParsedBookInfo {
   const info: ParsedBookInfo = {};
-  
-  const lineMatch = (pattern: RegExp): string => {
-    const m = text.match(pattern);
-    return m ? m[1].trim() : "";
+
+  const get = (key: string): string => {
+    const regex = new RegExp(`^${key}:\\s*(.+)$`, 'm');
+    const match = text.match(regex);
+    return match ? match[1].trim() : '';
   };
 
-  const titleKo = lineMatch(/제목\s*(?:\(?\s*KO\s*\)?)?\s*[:：]\s*(.+)/i);
+  const titleKo = get('제목KO');
   if (titleKo) info.title_ko = titleKo;
 
-  const titleEn = lineMatch(/(?:제목\s*\(?\s*EN\s*\)?|Title)\s*[:：]\s*(.+)/i);
+  const titleEn = get('제목EN');
   if (titleEn) info.title_en = titleEn;
 
-  const author = lineMatch(/저자\s*[:：]\s*(.+)/i);
+  const author = get('저자');
   if (author) info.author = author;
 
-  const yearLine = lineMatch(/연도\s*[:：]\s*(.+)/i);
-  if (yearLine) {
-    const yearNum = yearLine.match(/(\d{4})/);
+  const yearStr = get('연도');
+  if (yearStr) {
+    const yearNum = yearStr.match(/(\d{4})/);
     if (yearNum) info.year = yearNum[1];
   }
 
-  const pagesLine = lineMatch(/페이지\s*(?:수)?\s*[:：]\s*(.+)/i);
-  if (pagesLine) {
-    const pNum = pagesLine.match(/(\d+)/);
+  const pagesStr = get('페이지수');
+  if (pagesStr) {
+    const pNum = pagesStr.match(/(\d+)/);
     if (pNum) info.pages = pNum[1];
   }
 
-  const themeLine = lineMatch(/커버\s*(?:테마)?\s*[:：]\s*(.+)/i);
-  if (themeLine) {
-    const found = THEME_VALUES.find(v => themeLine.includes(v));
+  const theme = get('커버테마');
+  if (theme) {
+    const found = THEME_VALUES.find(v => theme.includes(v));
     if (found) info.cover_theme = found;
   }
 
-  const ratingMatch = text.match(/평점[^\d]*(\d+(?:\.\d+)?)/i) || text.match(/⭐\s*(\d+(?:\.\d+)?)/);
-  if (ratingMatch) {
-    info.rating = Math.min(5, Math.max(1, parseFloat(ratingMatch[1])));
+  const ratingStr = get('평점');
+  if (ratingStr) {
+    info.rating = Math.min(5, Math.max(1, parseFloat(ratingStr)));
+  }
+
+  // Also parse tags for passing to parent
+  const tagsRaw = get('태그KO');
+  if (tagsRaw) {
+    let tags_ko: string[] = [];
+    if (tagsRaw.includes('`')) {
+      tags_ko = tagsRaw.match(/`([^`]+)`/g)?.map(t => t.replace(/`/g, '').trim()) ?? [];
+    } else if (tagsRaw.includes(',')) {
+      tags_ko = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+    } else {
+      tags_ko = tagsRaw.split(/\s+/).filter(Boolean);
+    }
+    if (tags_ko.length > 0) info.tags_ko = tags_ko;
   }
 
   return info;
 }
 
 function parseBulkText(text: string): Partial<ManualSummary> & { _filledCount?: number } {
+  const get = (key: string): string => {
+    const regex = new RegExp(`^${key}:\\s*(.+)$`, 'm');
+    const match = text.match(regex);
+    return match ? match[1].trim() : '';
+  };
+
   const result: Partial<ManualSummary> = {};
   let filledSections = 0;
 
-  const extract = (startPatterns: RegExp, endPatterns: RegExp | null): string => {
-    for (const sp of [startPatterns]) {
-      const match = text.match(sp);
-      if (match) {
-        const startIdx = match.index! + match[0].length;
-        if (endPatterns) {
-          const rest = text.slice(startIdx);
-          const endMatch = rest.match(endPatterns);
-          return endMatch ? rest.slice(0, endMatch.index!).trim() : rest.trim();
-        }
-        return text.slice(startIdx).trim();
-      }
-    }
-    return "";
-  };
+  // Intro
+  const intro = get('작가소개KO');
+  if (intro) { result.intro = intro; filledSections++; }
 
-  // 1. Intro
-  const introText = extract(
-    /(?:작가\s*소개|집필\s*배경)[^\n]*\n/i,
-    /(?:챕터\s*1\b|마무리\s*분석|독자를\s*위한\s*질문|태그\s*\(|평점)/i
-  );
-  if (introText) { result.intro = introText; filledSections++; }
-
-  // 2. Chapters
-  const chapterRegex = /챕터\s*(\d+)/gi;
-  const chapterPositions: { num: number; start: number }[] = [];
-  let cm;
-  while ((cm = chapterRegex.exec(text)) !== null) {
-    chapterPositions.push({ num: parseInt(cm[1]), start: cm.index });
+  // Parse chapters dynamically
+  const chapters: Chapter[] = [];
+  const chapterNumbers: number[] = [];
+  const titleMatches = text.matchAll(/^챕터(\d+)제목KO:/gm);
+  for (const match of titleMatches) {
+    chapterNumbers.push(parseInt(match[1]));
   }
-
-  if (chapterPositions.length > 0) {
-    const chapters: ManualSummary["chapters"] = [];
-    for (let i = 0; i < chapterPositions.length && i < 10; i++) {
-      const start = chapterPositions[i].start;
-      const end = i + 1 < chapterPositions.length ? chapterPositions[i + 1].start : undefined;
-      const block = end ? text.slice(start, end) : text.slice(start);
-
-      const extractField = (patterns: RegExp[], endP: RegExp): string => {
-        for (const p of patterns) {
-          const m = block.match(p);
-          if (m) {
-            const s = m.index! + m[0].length;
-            const rest = block.slice(s);
-            const eM = rest.match(endP);
-            return eM ? rest.slice(0, eM.index!).trim() : rest.trim();
-          }
-        }
-        return "";
-      };
-
-      const fieldEnd = /(?:제목\s*\((?:KO|EN)\)|제목:|Title:|인용\s*\((?:KO|EN)\)|인용:|Quote:|본문\s*\((?:KO|EN)\)|본문:|Body:|챕터\s*\d+|마무리|독자|태그|평점)/i;
-
-      chapters.push({
-        number: chapterPositions[i].num,
-        title_ko: extractField([/제목\s*\(KO\)\s*:?\s*/i, /제목\s*:?\s*/i], /\n/),
-        title_en: extractField([/제목\s*\(EN\)\s*:?\s*/i, /Title\s*:?\s*/i], /\n/),
-        quote_ko: extractField([/인용\s*\(KO\)\s*:?\s*/i, /인용\s*:?\s*/i], fieldEnd),
-        quote_en: extractField([/인용\s*\(EN\)\s*:?\s*/i, /Quote\s*:?\s*/i], fieldEnd),
-        body_ko: extractField([/본문\s*\(KO\)\s*:?\s*/i, /본문\s*:?\s*/i], fieldEnd),
-        body_en: extractField([/본문\s*\(EN\)\s*:?\s*/i, /Body\s*:?\s*/i], fieldEnd),
-      });
-    }
-    if (chapters.length > 0) { result.chapters = chapters; filledSections++; }
+  for (const num of chapterNumbers) {
+    chapters.push({
+      number: num,
+      title_ko: get(`챕터${num}제목KO`),
+      title_en: '',
+      quote_ko: get(`챕터${num}인용KO`),
+      quote_en: '',
+      body_ko: get(`챕터${num}본문KO`),
+      body_en: '',
+    });
   }
+  if (chapters.length > 0) { result.chapters = chapters; filledSections++; }
 
-  // 3. Closing
-  const closingKo = extract(
-    /마무리\s*분석\s*\(KO\)[^\n]*\n/i,
-    /마무리\s*분석\s*\(EN\)/i
-  );
+  // Closing
+  const closingKo = get('마무리KO');
   if (closingKo) { result.closing_ko = closingKo; filledSections++; }
 
-  const closingEn = extract(
-    /마무리\s*분석\s*\(EN\)[^\n]*\n/i,
-    /(?:독자를?\s*위한\s*질문|태그\s*\(|평점)/i
-  );
-  if (closingEn) { result.closing_en = closingEn; filledSections++; }
-
-  // 4. Questions
-  const questionKo = extract(
-    /독자를?\s*위한\s*질문\s*\(KO\)[^\n]*\n/i,
-    /독자를?\s*위한\s*질문\s*\(EN\)/i
-  );
+  // Question
+  const questionKo = get('질문KO');
   if (questionKo) { result.question_ko = questionKo; filledSections++; }
 
-  const questionEn = extract(
-    /독자를?\s*위한\s*질문\s*\(EN\)[^\n]*\n/i,
-    /(?:태그\s*\(|평점)/i
-  );
-  if (questionEn) { result.question_en = questionEn; filledSections++; }
-
-  // 5. Tags
-  const tagsKoBlock = extract(/태그\s*\(KO\)[^\n]*\n/i, /(?:태그\s*\(EN\)|Tags\s*\(EN\)|평점)/i);
-  if (tagsKoBlock) {
-    result.tags_ko = parseTagsFromText(tagsKoBlock);
-    if (result.tags_ko.length > 0) filledSections++;
+  // Tags
+  const tagsRaw = get('태그KO');
+  if (tagsRaw) {
+    let tags_ko: string[] = [];
+    if (tagsRaw.includes('`')) {
+      tags_ko = tagsRaw.match(/`([^`]+)`/g)?.map(t => t.replace(/`/g, '').trim()) ?? [];
+    } else if (tagsRaw.includes(',')) {
+      tags_ko = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+    } else {
+      tags_ko = tagsRaw.split(/\s+/).filter(Boolean);
+    }
+    if (tags_ko.length > 0) { result.tags_ko = tags_ko; filledSections++; }
   }
 
-  const tagsEnBlock = extract(/(?:태그\s*\(EN\)|Tags\s*\(EN\))[^\n]*\n/i, /(?:평점)/i);
-  if (tagsEnBlock) {
-    result.tags_en = parseTagsFromText(tagsEnBlock);
-    if (result.tags_en.length > 0) filledSections++;
-  }
-
-  // 6. Rating
-  const ratingMatch = text.match(/평점[^\d]*(\d+(?:\.\d+)?)/i) || text.match(/⭐\s*(\d+(?:\.\d+)?)/);
-  if (ratingMatch) {
-    result.rating = Math.min(5, Math.max(1, parseFloat(ratingMatch[1])));
-    filledSections++;
+  // Rating
+  const ratingStr = get('평점');
+  if (ratingStr) {
+    const rating = parseFloat(ratingStr);
+    if (!isNaN(rating)) { result.rating = Math.min(5, Math.max(1, rating)); filledSections++; }
   }
 
   return { ...result, _filledCount: filledSections };
