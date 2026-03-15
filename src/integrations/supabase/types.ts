@@ -25,6 +25,7 @@ export type Database = {
           id: string
           intro_en: string | null
           intro_ko: string | null
+          key_passages: Json | null
           pages: number | null
           question_en: string | null
           question_ko: string | null
@@ -45,6 +46,7 @@ export type Database = {
           id?: string
           intro_en?: string | null
           intro_ko?: string | null
+          key_passages?: Json | null
           pages?: number | null
           question_en?: string | null
           question_ko?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           id?: string
           intro_en?: string | null
           intro_ko?: string | null
+          key_passages?: Json | null
           pages?: number | null
           question_en?: string | null
           question_ko?: string | null
