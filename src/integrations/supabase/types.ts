@@ -18,14 +18,18 @@ export type Database = {
         Row: {
           author: string | null
           chapters: Json | null
+          closing_en: string | null
           closing_ko: string | null
           cover_theme: string | null
           created_at: string | null
           id: string
+          intro_en: string | null
           intro_ko: string | null
           pages: number | null
+          question_en: string | null
           question_ko: string | null
           rating: number | null
+          tags_en: string[] | null
           tags_ko: string[] | null
           title_en: string | null
           title_ko: string
@@ -34,14 +38,18 @@ export type Database = {
         Insert: {
           author?: string | null
           chapters?: Json | null
+          closing_en?: string | null
           closing_ko?: string | null
           cover_theme?: string | null
           created_at?: string | null
           id?: string
+          intro_en?: string | null
           intro_ko?: string | null
           pages?: number | null
+          question_en?: string | null
           question_ko?: string | null
           rating?: number | null
+          tags_en?: string[] | null
           tags_ko?: string[] | null
           title_en?: string | null
           title_ko: string
@@ -50,14 +58,18 @@ export type Database = {
         Update: {
           author?: string | null
           chapters?: Json | null
+          closing_en?: string | null
           closing_ko?: string | null
           cover_theme?: string | null
           created_at?: string | null
           id?: string
+          intro_en?: string | null
           intro_ko?: string | null
           pages?: number | null
+          question_en?: string | null
           question_ko?: string | null
           rating?: number | null
+          tags_en?: string[] | null
           tags_ko?: string[] | null
           title_en?: string | null
           title_ko?: string
