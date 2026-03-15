@@ -4,6 +4,7 @@ import { getBookById, saveBook, type StoredBook } from "@/lib/bookStorage";
 import { toast } from "@/hooks/use-toast";
 import KeyPassagesEditor, { type KeyPassage } from "@/components/KeyPassagesEditor";
 import CommentSection from "@/components/CommentSection";
+import UserPassageSection from "@/components/UserPassageSection";
 
 interface EditState {
   [key: string]: string;
