@@ -251,13 +251,16 @@ const BookDetailPage = () => {
 
       {/* CHAPTERS */}
       {book.chapters.map((ch, idx) => {
-        const quote = t(ch.quote_ko, ch.quote_en);
-        const body = t(ch.body_ko, ch.body_en);
+        const chapterData = ch as unknown as Record<string, unknown>;
+        const title = getField(chapterData, "title_en", "title_ko");
+        const quote = getField(chapterData, "quote_en", "quote_ko");
+        const body = getField(chapterData, "body_en", "body_ko");
+
         return (
           <div key={ch.number} className="chapter-card">
             <div className="chapter-header">
               <div className="chapter-num">{ch.number}</div>
-              <div className="chapter-title">{t(ch.title_ko, ch.title_en)}</div>
+              <div className="chapter-title">{title}</div>
             </div>
             <div className="chapter-quote editable-section">
               {editButton(`ch_quote_${idx}`, quote)}
