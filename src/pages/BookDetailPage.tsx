@@ -294,6 +294,9 @@ const BookDetailPage = () => {
           )}
       </div>
 
+      {/* Comment Section */}
+      {book && <CommentSection bookId={book.id} />}
+
       {/* Key Passages Editor — admin only */}
       {isAdmin && book && (
         <KeyPassagesEditor
