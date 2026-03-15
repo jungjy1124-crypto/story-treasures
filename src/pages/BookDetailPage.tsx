@@ -24,15 +24,7 @@ const BookDetailPage = () => {
   useEffect(() => {
     if (slug) {
       getBookById(slug).then((found) => {
-        if (found) {
-          console.log("[BookDetail] loaded book:", JSON.stringify({
-            intro_en: found.intro_en?.slice(0, 50),
-            closing_en: found.closing_en?.slice(0, 50),
-            question_en: found.question_en?.slice(0, 50),
-            ch0_title_en: found.chapters?.[0]?.title_en,
-          }));
-          setBook(found);
-        }
+        if (found) setBook(found);
         setLoading(false);
       });
     }
