@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>책가 — 고전 문학 요약</title>
     <meta name="description" content="책가는 세계 고전 문학의 핵심을 챕터별로 요약해 제공하는 디지털 서재입니다.">
-    
+    <script>
+      (function() {
+        var query = window.location.search;
+        if (query.indexOf('p=') > -1) {
+          var params = new URLSearchParams(query);
+          var p = params.get('p');
+          var q = params.get('q');
+          window.history.replaceState(
+            null, null,
+            '/' + 'chaekga' + '/' + (p || '') +
+            (q ? '?' + q : '') + window.location.hash
+          );
+        }
+      })();
+    </script>
     
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Chaekga — Classic Literature Summaries">
