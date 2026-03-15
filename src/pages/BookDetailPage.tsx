@@ -3,6 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import { getBookById, saveBook, type StoredBook } from "@/lib/bookStorage";
 import { toast } from "@/hooks/use-toast";
 import KeyPassagesEditor, { type KeyPassage } from "@/components/KeyPassagesEditor";
+import CommentSection from "@/components/CommentSection";
 
 interface EditState {
   [key: string]: string;
