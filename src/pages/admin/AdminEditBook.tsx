@@ -8,24 +8,37 @@ export default function AdminEditBook() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [originalBook, setOriginalBook] = useState<any>(null);
 
   useEffect(() => {
-    const found = getBookById(id || "");
-    if (found) {
-      setBook({
-        intro: found.intro_ko,
-        intro_en: found.intro_en,
-        chapters: found.chapters,
-        closing_ko: found.closing_ko,
-        closing_en: found.closing_en,
-        question_ko: found.question_ko,
-        question_en: found.question_en,
-        tags_ko: found.tags_ko,
-        tags_en: found.tags_en,
-        rating: found.rating,
-      });
-    }
+    getBookById(id || "").then((found) => {
+      if (found) {
+        setOriginalBook(found);
+        setBook({
+          intro: found.intro_ko,
+          intro_en: found.intro_en,
+          chapters: found.chapters,
+          closing_ko: found.closing_ko,
+          closing_en: found.closing_en,
+          question_ko: found.question_ko,
+          question_en: found.question_en,
+          tags_ko: found.tags_ko,
+          tags_en: found.tags_en,
+          rating: found.rating,
+        });
+      }
+      setLoading(false);
+    });
   }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 0" }}>
+        <div className="admin-spinner" />
+      </div>
+    );
+  }
 
   if (!book) {
     return (
@@ -38,13 +51,12 @@ export default function AdminEditBook() {
     );
   }
 
-  const handleSave = () => {
-    const original = getBookById(id || "");
-    if (original) {
-      saveBook({
-        ...original,
-        intro_ko: book.intro || original.intro_ko,
-        intro_en: book.intro_en || original.intro_en,
+  const handleSave = async () => {
+    if (originalBook) {
+      const result = await saveBook({
+        ...originalBook,
+        intro_ko: book.intro || originalBook.intro_ko,
+        intro_en: book.intro_en || originalBook.intro_en,
         closing_ko: book.closing_ko,
         closing_en: book.closing_en,
         question_ko: book.question_ko,
@@ -54,9 +66,13 @@ export default function AdminEditBook() {
         rating: book.rating,
         chapters: book.chapters,
       });
+      if (result.success) {
+        toast({ title: "저장됐습니다 ✓" });
+        navigate("/admin/books");
+      } else {
+        toast({ title: "저장 실패", variant: "destructive" });
+      }
     }
-    toast({ title: "✅ 수정됐어요!" });
-    navigate("/admin/books");
   };
 
   return (

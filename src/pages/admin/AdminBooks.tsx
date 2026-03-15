@@ -1,26 +1,48 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBooks, deleteBook, type StoredBook } from "@/lib/bookStorage";
+import { toast } from "@/hooks/use-toast";
 
 export default function AdminBooks() {
   const navigate = useNavigate();
   const [books, setBooks] = useState<StoredBook[]>([]);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const fetchBooks = async () => {
+    setLoading(true);
+    const data = await getBooks();
+    setBooks(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    setBooks(getBooks());
+    fetchBooks();
   }, []);
 
   const filtered = books.filter(
     (b) => b.title_ko.includes(search) || b.author.includes(search)
   );
 
-  const handleDelete = (id: string) => {
-    deleteBook(id);
-    setBooks(getBooks());
+  const handleDelete = async (id: string) => {
+    const result = await deleteBook(id);
+    if (result.success) {
+      toast({ title: "삭제됐습니다 ✓" });
+      await fetchBooks();
+    } else {
+      toast({ title: "삭제 실패", variant: "destructive" });
+    }
     setConfirmId(null);
   };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 0" }}>
+        <div className="admin-spinner" />
+      </div>
+    );
+  }
 
   if (books.length === 0) {
     return (

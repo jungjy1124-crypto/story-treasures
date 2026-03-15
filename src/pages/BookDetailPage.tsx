@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { getBookById, saveBook, type StoredBook } from "@/lib/bookStorage";
+import { toast } from "@/hooks/use-toast";
 
 interface EditState {
   [key: string]: string;
@@ -13,16 +14,27 @@ const BookDetailPage = () => {
   const isAdmin = !!localStorage.getItem("cgAdmin");
 
   const [book, setBook] = useState<StoredBook | null>(null);
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<EditState>({});
   const [editValues, setEditValues] = useState<EditState>({});
   const [hasEdits, setHasEdits] = useState(false);
 
   useEffect(() => {
     if (slug) {
-      const found = getBookById(slug);
-      if (found) setBook(found);
+      getBookById(slug).then((found) => {
+        if (found) setBook(found);
+        setLoading(false);
+      });
     }
   }, [slug]);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "80px 0" }}>
+        <div className="admin-spinner" />
+      </div>
+    );
+  }
 
   if (!book) {
     return (
@@ -77,10 +89,15 @@ const BookDetailPage = () => {
     cancelEdit(key);
   };
 
-  const saveAll = () => {
+  const saveAll = async () => {
     if (book) {
-      saveBook(book);
-      setHasEdits(false);
+      const result = await saveBook(book);
+      if (result.success) {
+        toast({ title: "저장됐습니다 ✓" });
+        setHasEdits(false);
+      } else {
+        toast({ title: "저장 실패", variant: "destructive" });
+      }
     }
   };
 
