@@ -24,7 +24,14 @@ const BookDetailPage = () => {
   useEffect(() => {
     if (slug) {
       getBookById(slug).then((found) => {
-        if (found) setBook(found);
+        if (found) {
+          console.log('=== BOOK EN DEBUG ===');
+          console.log('intro_en:', found.intro_en);
+          console.log('closing_en:', found.closing_en);
+          console.log('question_en:', found.question_en);
+          console.log('chapters sample:', JSON.stringify(found.chapters?.[0]));
+          setBook(found);
+        }
         setLoading(false);
       });
     }
