@@ -13,6 +13,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminBooks from "./pages/admin/AdminBooks";
 import AdminAddBook from "./pages/admin/AdminAddBook";
 import AdminEditBook from "./pages/admin/AdminEditBook";
+import AdminPassages from "./pages/admin/AdminPassages";
 
 const queryClient = new QueryClient();
 
