@@ -61,7 +61,7 @@ const UserPassageSection = ({ bookId }: Props) => {
     };
     if (chapter.trim()) insertData.chapter = parseInt(chapter.trim());
 
-    const { error } = await supabase.from("user_passages").insert(insertData);
+    const { error } = await supabase.from("user_passages").insert(insertData as any);
     setSubmitting(false);
 
     if (error) {
