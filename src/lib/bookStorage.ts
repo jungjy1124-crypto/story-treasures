@@ -1,4 +1,4 @@
-const STORAGE_KEY = "chaekgado_books";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface StoredBook {
   id: string;
@@ -29,31 +29,107 @@ export interface StoredBook {
   created_at: string;
 }
 
-export function getBooks(): StoredBook[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
+// Map DB row to StoredBook
+function rowToBook(row: any): StoredBook {
+  return {
+    id: row.id,
+    title_ko: row.title_ko || "",
+    title_en: row.title_en || "",
+    author: row.author || "",
+    year: row.year || 0,
+    pages: row.pages || 0,
+    cover_theme: row.cover_theme || "theme-dark",
+    rating: Number(row.rating) || 0,
+    intro_ko: row.intro_ko || "",
+    intro_en: "",
+    closing_ko: row.closing_ko || "",
+    closing_en: "",
+    question_ko: row.question_ko || "",
+    question_en: "",
+    tags_ko: row.tags_ko || [],
+    tags_en: [],
+    chapters: Array.isArray(row.chapters) ? row.chapters : [],
+    created_at: row.created_at || new Date().toISOString(),
+  };
+}
+
+export async function getBooks(): Promise<StoredBook[]> {
+  const { data, error } = await supabase
+    .from("books")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("Failed to fetch books:", error);
     return [];
   }
+  return (data || []).map(rowToBook);
 }
 
-export function getBookById(id: string): StoredBook | undefined {
-  return getBooks().find((b) => b.id === id);
-}
-
-export function saveBook(book: StoredBook): void {
-  const books = getBooks();
-  const idx = books.findIndex((b) => b.id === book.id);
-  if (idx >= 0) {
-    books[idx] = book;
-  } else {
-    books.push(book);
+export async function getBookById(id: string): Promise<StoredBook | undefined> {
+  const { data, error } = await supabase
+    .from("books")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error || !data) {
+    console.error("Failed to fetch book:", error);
+    return undefined;
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+  return rowToBook(data);
 }
 
-export function deleteBook(id: string): void {
-  const books = getBooks().filter((b) => b.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+export async function saveBook(book: StoredBook): Promise<{ success: boolean; error?: string }> {
+  // Check if book exists
+  const { data: existing } = await supabase
+    .from("books")
+    .select("id")
+    .eq("id", book.id)
+    .maybeSingle();
+
+  const dbData = {
+    title_ko: book.title_ko,
+    title_en: book.title_en || null,
+    author: book.author || null,
+    year: book.year || null,
+    pages: book.pages || null,
+    cover_theme: book.cover_theme || null,
+    rating: book.rating || null,
+    intro_ko: book.intro_ko || null,
+    closing_ko: book.closing_ko || null,
+    question_ko: book.question_ko || null,
+    tags_ko: book.tags_ko || [],
+    chapters: book.chapters as any,
+  };
+
+  if (existing) {
+    const { error } = await supabase
+      .from("books")
+      .update(dbData)
+      .eq("id", book.id);
+    if (error) {
+      console.error("Failed to update book:", error);
+      return { success: false, error: error.message };
+    }
+  } else {
+    const { error } = await supabase
+      .from("books")
+      .insert({ id: book.id, ...dbData });
+    if (error) {
+      console.error("Failed to insert book:", error);
+      return { success: false, error: error.message };
+    }
+  }
+  return { success: true };
+}
+
+export async function deleteBook(id: string): Promise<{ success: boolean; error?: string }> {
+  const { error } = await supabase
+    .from("books")
+    .delete()
+    .eq("id", id);
+  if (error) {
+    console.error("Failed to delete book:", error);
+    return { success: false, error: error.message };
+  }
+  return { success: true };
 }
