@@ -95,9 +95,13 @@ export async function saveBook(book: StoredBook): Promise<{ success: boolean; er
     cover_theme: book.cover_theme || null,
     rating: book.rating || null,
     intro_ko: book.intro_ko || null,
+    intro_en: book.intro_en || null,
     closing_ko: book.closing_ko || null,
+    closing_en: book.closing_en || null,
     question_ko: book.question_ko || null,
+    question_en: book.question_en || null,
     tags_ko: book.tags_ko || [],
+    tags_en: book.tags_en || [],
     chapters: book.chapters as any,
   };
 
