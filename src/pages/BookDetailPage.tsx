@@ -19,23 +19,28 @@ const BookDetailPage = () => {
   const [editing, setEditing] = useState<EditState>({});
   const [editValues, setEditValues] = useState<EditState>({});
   const [hasEdits, setHasEdits] = useState(false);
-  const [lang, setLang] = useState<"ko" | "en">("ko");
+  const [lang, setLang] = useState<"ko" | "en">(pathname.startsWith("/en") ? "en" : "ko");
+
+  useEffect(() => {
+    setLang(pathname.startsWith("/en") ? "en" : "ko");
+  }, [pathname]);
 
   useEffect(() => {
     if (slug) {
       getBookById(slug).then((found) => {
         if (found) {
-          console.log('=== BOOK EN DEBUG ===');
-          console.log('intro_en:', found.intro_en);
-          console.log('closing_en:', found.closing_en);
-          console.log('question_en:', found.question_en);
-          console.log('chapters sample:', JSON.stringify(found.chapters?.[0]));
+          console.log("=== BOOK EN DEBUG ===");
+          console.log("intro_en:", found.intro_en);
+          console.log("closing_en:", found.closing_en);
+          console.log("question_en:", found.question_en);
+          console.log("chapters sample:", JSON.stringify(found.chapters?.[0]));
+          console.log("lang state:", pathname.startsWith("/en") ? "en" : "ko");
           setBook(found);
         }
         setLoading(false);
       });
     }
-  }, [slug]);
+  }, [slug, pathname]);
 
   if (loading) {
     return (
@@ -52,6 +57,15 @@ const BookDetailPage = () => {
       </div>
     );
   }
+
+  const getField = (obj: Record<string, unknown> | null | undefined, enKey: string, koKey: string) => {
+    if (!obj) return "";
+    const enVal = obj[enKey];
+    const koVal = obj[koKey];
+    if (lang === "en" && typeof enVal === "string" && enVal.trim() !== "") return enVal;
+    if (typeof koVal === "string") return koVal;
+    return "";
+  };
 
   // Helper: get field with EN fallback to KO (empty string = missing)
   const t = (ko: string | undefined, en: string | undefined) => {
@@ -108,9 +122,9 @@ const BookDetailPage = () => {
     }
   };
 
-  const intro = t(book.intro_ko, book.intro_en);
-  const closing = t(book.closing_ko, book.closing_en);
-  const question = t(book.question_ko, book.question_en);
+  const intro = getField(book as unknown as Record<string, unknown>, "intro_en", "intro_ko");
+  const closing = getField(book as unknown as Record<string, unknown>, "closing_en", "closing_ko");
+  const question = getField(book as unknown as Record<string, unknown>, "question_en", "question_ko");
   const tags = lang === "en" && book.tags_en?.length ? book.tags_en : book.tags_ko;
   const authorLabel = lang === "ko" ? "저자" : "by";
 
@@ -233,13 +247,16 @@ const BookDetailPage = () => {
 
       {/* CHAPTERS */}
       {book.chapters.map((ch, idx) => {
-        const quote = t(ch.quote_ko, ch.quote_en);
-        const body = t(ch.body_ko, ch.body_en);
+        const chapterData = ch as unknown as Record<string, unknown>;
+        const title = getField(chapterData, "title_en", "title_ko");
+        const quote = getField(chapterData, "quote_en", "quote_ko");
+        const body = getField(chapterData, "body_en", "body_ko");
+
         return (
           <div key={ch.number} className="chapter-card">
             <div className="chapter-header">
               <div className="chapter-num">{ch.number}</div>
-              <div className="chapter-title">{t(ch.title_ko, ch.title_en)}</div>
+              <div className="chapter-title">{title}</div>
             </div>
             <div className="chapter-quote editable-section">
               {editButton(`ch_quote_${idx}`, quote)}
