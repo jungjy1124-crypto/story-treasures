@@ -40,7 +40,11 @@ const BookDetailPage = () => {
         setLoading(false);
       });
     }
-  }, [slug, lang]);
+  }, [slug]);
+
+  useEffect(() => {
+    console.log("lang state:", lang);
+  }, [lang]);
 
   if (loading) {
     return (
