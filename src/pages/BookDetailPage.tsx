@@ -19,23 +19,28 @@ const BookDetailPage = () => {
   const [editing, setEditing] = useState<EditState>({});
   const [editValues, setEditValues] = useState<EditState>({});
   const [hasEdits, setHasEdits] = useState(false);
-  const [lang, setLang] = useState<"ko" | "en">("ko");
+  const [lang, setLang] = useState<"ko" | "en">(pathname.startsWith("/en") ? "en" : "ko");
+
+  useEffect(() => {
+    setLang(pathname.startsWith("/en") ? "en" : "ko");
+  }, [pathname]);
 
   useEffect(() => {
     if (slug) {
       getBookById(slug).then((found) => {
         if (found) {
-          console.log('=== BOOK EN DEBUG ===');
-          console.log('intro_en:', found.intro_en);
-          console.log('closing_en:', found.closing_en);
-          console.log('question_en:', found.question_en);
-          console.log('chapters sample:', JSON.stringify(found.chapters?.[0]));
+          console.log("=== BOOK EN DEBUG ===");
+          console.log("intro_en:", found.intro_en);
+          console.log("closing_en:", found.closing_en);
+          console.log("question_en:", found.question_en);
+          console.log("chapters sample:", JSON.stringify(found.chapters?.[0]));
+          console.log("lang state:", lang);
           setBook(found);
         }
         setLoading(false);
       });
     }
-  }, [slug]);
+  }, [slug, lang]);
 
   if (loading) {
     return (
@@ -52,6 +57,15 @@ const BookDetailPage = () => {
       </div>
     );
   }
+
+  const getField = (obj: Record<string, unknown> | null | undefined, enKey: string, koKey: string) => {
+    if (!obj) return "";
+    const enVal = obj[enKey];
+    const koVal = obj[koKey];
+    if (lang === "en" && typeof enVal === "string" && enVal.trim() !== "") return enVal;
+    if (typeof koVal === "string") return koVal;
+    return "";
+  };
 
   // Helper: get field with EN fallback to KO (empty string = missing)
   const t = (ko: string | undefined, en: string | undefined) => {
