@@ -269,6 +269,15 @@ const BookDetailPage = () => {
           )}
       </div>
 
+      {/* Key Passages Editor — admin only */}
+      {isAdmin && book && (
+        <KeyPassagesEditor
+          bookId={book.id}
+          passages={((book as any).key_passages || []) as KeyPassage[]}
+          onUpdate={(updated) => setBook({ ...book, key_passages: updated } as any)}
+        />
+      )}
+
       {/* Floating save bar */}
       {hasEdits && (
         <div className="floating-save-bar">
