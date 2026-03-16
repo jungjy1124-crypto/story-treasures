@@ -749,67 +749,69 @@
 }
 
 /* ── CHAPTER CARD ── */
+/* ── CHAPTER CARD ── */
 .chapter-card {
-  background: var(--card);
-  margin: 0 0 28px;
+  background: #ffffff;
+  margin: 0 0 20px;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(160,132,92,0.15);
-  box-shadow: 0 2px 8px rgba(44,31,14,0.06);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border: 0.5px solid rgba(160,132,92,0.2);
+  transition: box-shadow 0.3s ease;
   animation: fadeInUp 0.4s ease forwards;
-  padding: 24px 28px;
 }
 .chapter-card:hover {
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 16px rgba(44,31,14,0.08);
 }
+
+/* ── CHAPTER HEADER (dark) ── */
 .chapter-header {
+  background: #2C1F0E;
+  padding: 14px 20px;
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 12px;
 }
 .chapter-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1;
-  min-width: 30px;
-  padding-top: 2px;
-  position: relative;
+  font-size: 12px;
+  font-weight: 600;
+  color: #C9A84C;
+  background: rgba(201,168,76,0.15);
+  border-radius: 4px;
+  padding: 2px 8px;
+  line-height: 1.4;
+  min-width: auto;
+  font-family: inherit;
 }
 .chapter-num::before {
-  content: '';
-  position: absolute;
-  left: -10px;
-  top: 2px;
-  bottom: 2px;
-  width: 3px;
-  background: var(--accent);
-  border-radius: 2px;
+  display: none;
 }
 .chapter-title {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
   line-height: 1.5;
   flex: 1;
-  color: var(--text);
+  color: #F5EDD8;
+  font-family: 'Noto Serif KR', serif;
+}
+
+/* ── CHAPTER BODY AREA ── */
+.chapter-card-body {
+  padding: 18px 20px;
 }
 
 /* ── QUOTES CONTAINER ── */
 .chapter-quotes-stack {
-  border-left: 3px solid var(--accent);
-  padding-left: 16px;
-  margin-bottom: 20px;
+  border-left: 2px solid #C9A84C;
+  padding-left: 14px;
+  margin-bottom: 14px;
 }
 .chapter-quote {
   font-family: 'Noto Serif KR', serif;
   font-style: italic;
+  font-size: 14px;
   line-height: 1.7;
   margin: 0;
-  padding: 10px 0;
+  padding: 7px 0;
   background: transparent;
   border: none;
   border-radius: 0;
@@ -818,23 +820,21 @@
 .chapter-quote:not(:last-child) {
   border-bottom: 1px solid rgba(201,168,76,0.2);
 }
-.chapter-quote.quote-rank-0 {
-  font-size: 15px;
-  color: #4A3520;
-}
-.chapter-quote.quote-rank-1 {
-  font-size: 14px;
-  color: #6B4C2A;
-}
-.chapter-quote.quote-rank-2 {
-  font-size: 14px;
-  color: #8B6914;
-}
+.chapter-quote.quote-rank-0 { color: #5C4A2A; }
+.chapter-quote.quote-rank-1 { color: #6B4C2A; }
+.chapter-quote.quote-rank-2 { color: #8B6914; }
 .chapter-quote::before {
   display: none;
 }
+
+/* ── CHAPTER BODY TEXT ── */
 .chapter-body {
-  padding: 0;
+  border-top: 1px solid rgba(201,168,76,0.15);
+  padding-top: 14px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #3D2B1F;
+}
   font-size: 15px;
   line-height: 1.9;
   color: var(--text);
