@@ -160,8 +160,16 @@ function parseBulkText(text: string): Partial<ManualSummary> & { _filledCount?: 
       number: num,
       title_ko: get(`챕터${num}제목KO`),
       title_en: get(`챕터${num}제목EN`),
-      quote_ko: get(`챕터${num}인용KO`),
-      quote_en: get(`챕터${num}인용EN`),
+      quotes_ko: [
+        get(`챕터${num}인용1KO`) || get(`챕터${num}인용KO`) || "",
+        get(`챕터${num}인용2KO`) || "",
+        get(`챕터${num}인용3KO`) || "",
+      ].filter((q, i) => i < 2 || q), // Keep first 2 always, 3rd only if filled
+      quotes_en: [
+        get(`챕터${num}인용1EN`) || get(`챕터${num}인용EN`) || "",
+        get(`챕터${num}인용2EN`) || "",
+        get(`챕터${num}인용3EN`) || "",
+      ].filter((q, i) => i < 2 || q),
       body_ko: get(`챕터${num}본문KO`),
       body_en: get(`챕터${num}본문EN`),
     });
