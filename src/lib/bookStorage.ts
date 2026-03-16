@@ -21,10 +21,13 @@ export interface StoredBook {
     number: number;
     title_ko: string;
     title_en: string;
-    quote_ko: string;
-    quote_en: string;
+    quotes_ko: string[];
+    quotes_en: string[];
     body_ko: string;
     body_en: string;
+    // Legacy single-quote fields (for backward compat)
+    quote_ko?: string;
+    quote_en?: string;
   }[];
   created_at: string;
 }
@@ -48,7 +51,14 @@ function rowToBook(row: any): StoredBook {
     question_en: row.question_en || "",
     tags_ko: row.tags_ko || [],
     tags_en: row.tags_en || [],
-    chapters: Array.isArray(row.chapters) ? row.chapters : [],
+    chapters: Array.isArray(row.chapters)
+      ? row.chapters.map((ch: any) => ({
+          ...ch,
+          // Migrate legacy single quote to quotes array
+          quotes_ko: ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : []),
+          quotes_en: ch.quotes_en || (ch.quote_en ? [ch.quote_en] : []),
+        }))
+      : [],
     created_at: row.created_at || new Date().toISOString(),
   };
 }
@@ -107,7 +117,15 @@ export async function saveBook(book: StoredBook): Promise<{ success: boolean; er
     question_en: book.question_en || null,
     tags_ko: book.tags_ko || [],
     tags_en: book.tags_en || [],
-    chapters: book.chapters as any,
+    chapters: book.chapters.map(ch => ({
+      number: ch.number,
+      title_ko: ch.title_ko,
+      title_en: ch.title_en,
+      quotes_ko: ch.quotes_ko || [],
+      quotes_en: ch.quotes_en || [],
+      body_ko: ch.body_ko,
+      body_en: ch.body_en,
+    })) as any,
   };
 
   if (existing) {

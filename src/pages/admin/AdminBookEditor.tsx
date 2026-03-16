@@ -4,10 +4,12 @@ interface Chapter {
   number: number;
   title_ko: string;
   title_en: string;
-  quote_ko: string;
-  quote_en: string;
+  quotes_ko: string[];
+  quotes_en: string[];
   body_ko: string;
   body_en: string;
+  quote_ko?: string;
+  quote_en?: string;
 }
 
 interface SummaryData {
@@ -109,13 +111,53 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
                   onChange={(e) => updateChapter(idx, lang === "ko" ? { title_ko: e.target.value } : { title_en: e.target.value })}
                 />
 
-                <label className="admin-label">인용</label>
-                <textarea
-                  className="admin-textarea admin-quote"
-                  rows={3}
-                  value={lang === "ko" ? ch.quote_ko : ch.quote_en}
-                  onChange={(e) => updateChapter(idx, lang === "ko" ? { quote_ko: e.target.value } : { quote_en: e.target.value })}
-                />
+                {[0, 1, 2].map((qi) => {
+                  const quotes = lang === "ko"
+                    ? (ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : [""]))
+                    : (ch.quotes_en || (ch.quote_en ? [ch.quote_en] : [""]));
+                  const quoteVal = quotes[qi] || "";
+                  if (qi === 2 && !quoteVal && quotes.length < 3) return null;
+                  return (
+                    <div key={qi}>
+                      <label className="admin-label" style={{ fontSize: 12, color: "#8B6914" }}>
+                        인용구 {qi + 1}{qi === 2 && <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> (선택)</span>}
+                      </label>
+                      <textarea
+                        className="admin-textarea admin-quote"
+                        rows={3}
+                        value={quoteVal}
+                        onChange={(e) => {
+                          const newQuotes = [...quotes];
+                          while (newQuotes.length <= qi) newQuotes.push("");
+                          newQuotes[qi] = e.target.value;
+                          updateChapter(idx, lang === "ko" ? { quotes_ko: newQuotes } : { quotes_en: newQuotes });
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+                {(() => {
+                  const quotes = lang === "ko"
+                    ? (ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : [""]))
+                    : (ch.quotes_en || (ch.quote_en ? [ch.quote_en] : [""]));
+                  if (quotes.length < 3) {
+                    return (
+                      <button
+                        type="button"
+                        className="admin-btn-secondary"
+                        style={{ fontSize: 12, padding: "4px 12px", marginBottom: 8 }}
+                        onClick={() => {
+                          const newQuotes = [...quotes];
+                          while (newQuotes.length < 3) newQuotes.push("");
+                          updateChapter(idx, lang === "ko" ? { quotes_ko: newQuotes } : { quotes_en: newQuotes });
+                        }}
+                      >
+                        + 인용구 3 추가
+                      </button>
+                    );
+                  }
+                  return null;
+                })()}
 
                 <label className="admin-label">본문</label>
                 <textarea

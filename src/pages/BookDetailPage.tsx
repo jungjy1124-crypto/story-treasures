@@ -96,10 +96,15 @@ const BookDetailPage = () => {
     } else if (key === "question") {
       if (lang === "en") updated.question_en = val; else updated.question_ko = val;
     } else if (key.startsWith("ch_quote_")) {
-      const idx = parseInt(key.split("_")[2]);
+      const parts = key.split("_");
+      const idx = parseInt(parts[2]);
+      const qi = parseInt(parts[3]);
       updated.chapters = [...updated.chapters];
       updated.chapters[idx] = { ...updated.chapters[idx] };
-      if (lang === "en") updated.chapters[idx].quote_en = val; else updated.chapters[idx].quote_ko = val;
+      const quotesKey = lang === "en" ? "quotes_en" : "quotes_ko";
+      const newQuotes = [...(updated.chapters[idx][quotesKey] || [])];
+      newQuotes[qi] = val;
+      updated.chapters[idx][quotesKey] = newQuotes;
     } else if (key.startsWith("ch_body_")) {
       const idx = parseInt(key.split("_")[2]);
       updated.chapters = [...updated.chapters];
@@ -265,8 +270,14 @@ const BookDetailPage = () => {
       {book.chapters.map((ch, idx) => {
         const chapterData = ch as unknown as Record<string, unknown>;
         const title = getField(chapterData, "title_en", "title_ko");
-        const quote = getField(chapterData, "quote_en", "quote_ko");
         const body = getField(chapterData, "body_en", "body_ko");
+
+        // Get quotes array with backward compat
+        const quotesKo = (ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : []));
+        const quotesEn = (ch.quotes_en || (ch.quote_en ? [ch.quote_en] : []));
+        const quotes = lang === "en"
+          ? quotesEn.map((q, i) => (q && q.trim()) ? q : (quotesKo[i] || ""))
+          : quotesKo;
 
         return (
           <div key={ch.number} className="chapter-card">
@@ -274,11 +285,19 @@ const BookDetailPage = () => {
               <div className="chapter-num">{ch.number}</div>
               <div className="chapter-title">{title}</div>
             </div>
-            <div className="chapter-quote editable-section">
-              {editButton(`ch_quote_${idx}`, quote)}
-              {editing[`ch_quote_${idx}`] !== undefined
-                ? renderEditable(`ch_quote_${idx}`, quote)
-                : <span>{quote}</span>}
+            <div className="chapter-quotes-stack">
+              {quotes.map((quote, qi) => {
+                if (!quote || !quote.trim()) return null;
+                const editKey = `ch_quote_${idx}_${qi}`;
+                return (
+                  <div key={qi} className="chapter-quote editable-section" style={{ marginBottom: qi < quotes.length - 1 ? 8 : 0 }}>
+                    {editButton(editKey, quote)}
+                    {editing[editKey] !== undefined
+                      ? renderEditable(editKey, quote)
+                      : <span>{quote}</span>}
+                  </div>
+                );
+              })}
             </div>
             <div className="chapter-body editable-section">
               {editButton(`ch_body_${idx}`, body)}

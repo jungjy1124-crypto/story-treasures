@@ -6,8 +6,8 @@ interface Chapter {
   number: number;
   title_ko: string;
   title_en: string;
-  quote_ko: string;
-  quote_en: string;
+  quotes_ko: string[];
+  quotes_en: string[];
   body_ko: string;
   body_en: string;
 }
@@ -36,7 +36,7 @@ export interface ParsedBookInfo {
 }
 
 function createEmptyChapter(num: number): Chapter {
-  return { number: num, title_ko: "", title_en: "", quote_ko: "", quote_en: "", body_ko: "", body_en: "" };
+  return { number: num, title_ko: "", title_en: "", quotes_ko: ["", ""], quotes_en: ["", ""], body_ko: "", body_en: "" };
 }
 
 function createEmptySummary(): ManualSummary {
@@ -160,8 +160,16 @@ function parseBulkText(text: string): Partial<ManualSummary> & { _filledCount?: 
       number: num,
       title_ko: get(`챕터${num}제목KO`),
       title_en: get(`챕터${num}제목EN`),
-      quote_ko: get(`챕터${num}인용KO`),
-      quote_en: get(`챕터${num}인용EN`),
+      quotes_ko: [
+        get(`챕터${num}인용1KO`) || get(`챕터${num}인용KO`) || "",
+        get(`챕터${num}인용2KO`) || "",
+        get(`챕터${num}인용3KO`) || "",
+      ].filter((q, i) => i < 2 || q), // Keep first 2 always, 3rd only if filled
+      quotes_en: [
+        get(`챕터${num}인용1EN`) || get(`챕터${num}인용EN`) || "",
+        get(`챕터${num}인용2EN`) || "",
+        get(`챕터${num}인용3EN`) || "",
+      ].filter((q, i) => i < 2 || q),
       body_ko: get(`챕터${num}본문KO`),
       body_en: get(`챕터${num}본문EN`),
     });
@@ -413,14 +421,53 @@ export default function ManualBookForm({ onBack, onNext, onParsedInfo, initialDa
                   onChange={(e) => updateChapter(idx, lang === "ko" ? { title_ko: e.target.value } : { title_en: e.target.value })}
                 />
 
-                <label className="admin-label">{lang === "ko" ? "인용" : "Quote"}</label>
-                <textarea
-                  className="admin-textarea manual-quote-input"
-                  rows={3}
-                  placeholder={lang === "ko" ? "핵심 장면을 묘사하는 2-3문장..." : "2-3 sentences describing the key scene..."}
-                  value={lang === "ko" ? ch.quote_ko : ch.quote_en}
-                  onChange={(e) => updateChapter(idx, lang === "ko" ? { quote_ko: e.target.value } : { quote_en: e.target.value })}
-                />
+                {[0, 1, 2].map((qi) => {
+                  const quotes = lang === "ko" ? ch.quotes_ko : ch.quotes_en;
+                  const quoteVal = (quotes || [])[qi] || "";
+                  // Always show quote 1 & 2, show 3 only if it exists or user wants to add
+                  if (qi === 2 && !quoteVal && !(quotes || []).length) return null;
+                  return (
+                    <div key={qi}>
+                      <label className="admin-label" style={{ fontSize: 12, color: "#8B6914" }}>
+                        {lang === "ko" ? `인용구 ${qi + 1}` : `Quote ${qi + 1}`}
+                        {qi === 2 && <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> (선택)</span>}
+                      </label>
+                      <textarea
+                        className="admin-textarea manual-quote-input"
+                        rows={3}
+                        placeholder={lang === "ko" ? `인용구 ${qi + 1}을 입력하세요...` : `Enter quote ${qi + 1}...`}
+                        value={quoteVal}
+                        onChange={(e) => {
+                          const newQuotes = [...(lang === "ko" ? ch.quotes_ko : ch.quotes_en) || ["", ""]];
+                          while (newQuotes.length <= qi) newQuotes.push("");
+                          newQuotes[qi] = e.target.value;
+                          updateChapter(idx, lang === "ko" ? { quotes_ko: newQuotes } : { quotes_en: newQuotes });
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+                {/* Add quote 3 button if not shown */}
+                {(() => {
+                  const quotes = lang === "ko" ? ch.quotes_ko : ch.quotes_en;
+                  if ((quotes || []).length < 3) {
+                    return (
+                      <button
+                        type="button"
+                        className="admin-btn-secondary"
+                        style={{ fontSize: 12, padding: "4px 12px", marginBottom: 8 }}
+                        onClick={() => {
+                          const newQuotes = [...(quotes || ["", ""])];
+                          while (newQuotes.length < 3) newQuotes.push("");
+                          updateChapter(idx, lang === "ko" ? { quotes_ko: newQuotes } : { quotes_en: newQuotes });
+                        }}
+                      >
+                        + 인용구 3 추가
+                      </button>
+                    );
+                  }
+                  return null;
+                })()}
 
                 <label className="admin-label">{lang === "ko" ? "본문" : "Body"}</label>
                 <textarea
