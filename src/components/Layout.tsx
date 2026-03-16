@@ -125,7 +125,7 @@ const Layout = () => {
         </div>
       </div>
 
-      <ChatWidget />
+      
     </div>
   );
 };
