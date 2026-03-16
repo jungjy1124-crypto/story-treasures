@@ -120,7 +120,10 @@ const HomePage = () => {
               </div>
               <div className="book-info">
                 <div className="book-author">
-                  {book.author} · {book.year}
+                  {book.author}
+                </div>
+                <div className="book-year">
+                  {book.year}
                 </div>
                 <div className="book-tags">
                   {(isKo ? book.tags_ko : book.tags_en).slice(0, 2).map((tag) => (
