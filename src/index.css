@@ -532,6 +532,11 @@
   padding: 0 32px;
   width: 100%;
 }
+@media (max-width: 600px) {
+  .book-detail-container {
+    padding: 0 16px;
+  }
+}
 
 .book-detail-hero {
   background: #2C2013;
