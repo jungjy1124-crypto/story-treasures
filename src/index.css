@@ -692,7 +692,7 @@
 
 /* ── CHAPTER PROGRESS ── */
 .chapter-progress {
-  margin: 0 16px 8px;
+  margin: 0 0 8px;
   display: flex;
   align-items: center;
   gap: 10px;
