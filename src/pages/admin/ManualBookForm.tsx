@@ -36,7 +36,7 @@ export interface ParsedBookInfo {
 }
 
 function createEmptyChapter(num: number): Chapter {
-  return { number: num, title_ko: "", title_en: "", quote_ko: "", quote_en: "", body_ko: "", body_en: "" };
+  return { number: num, title_ko: "", title_en: "", quotes_ko: ["", ""], quotes_en: ["", ""], body_ko: "", body_en: "" };
 }
 
 function createEmptySummary(): ManualSummary {
