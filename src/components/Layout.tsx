@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import ChatWidget from "./ChatWidget";
+
 
 const Layout = () => {
   const { pathname } = useLocation();
@@ -125,7 +125,7 @@ const Layout = () => {
         </div>
       </div>
 
-      <ChatWidget />
+      
     </div>
   );
 };
