@@ -461,9 +461,9 @@
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.8);
-  backdrop-filter: blur(20px) saturate(1.8);
-  border-top: 1px solid var(--border);
+  background: #2C1F0E;
+  backdrop-filter: none;
+  border-top: none;
   z-index: 100;
 }
 .bottom-nav-inner {
