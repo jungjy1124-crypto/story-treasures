@@ -817,7 +817,7 @@
   font-size: 15px;
   line-height: 1.9;
   color: var(--text);
-  max-width: 680px;
+  max-width: none;
 }
 .chapter-body p { margin-bottom: 12px; }
 .chapter-body p:last-child { margin-bottom: 0; }
