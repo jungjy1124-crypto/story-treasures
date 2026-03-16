@@ -6,8 +6,8 @@ interface Chapter {
   number: number;
   title_ko: string;
   title_en: string;
-  quote_ko: string;
-  quote_en: string;
+  quotes_ko: string[];
+  quotes_en: string[];
   body_ko: string;
   body_en: string;
 }
