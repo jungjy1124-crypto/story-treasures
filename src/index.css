@@ -1701,7 +1701,7 @@ select.admin-input { appearance: auto; }
   width: 100%;
   background: none;
   border: none;
-  color: var(--text);
+  color: rgba(255,255,255,0.7);
   font-size: 13px;
   padding: 10px 14px;
   text-align: left;
@@ -1710,7 +1710,7 @@ select.admin-input { appearance: auto; }
   transition: background 0.15s, color 0.15s;
 }
 .menu-dropdown-item:hover {
-  background: rgba(201,168,76,0.1);
+  background: rgba(201,168,76,0.12);
   color: var(--accent);
 }
 
