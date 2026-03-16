@@ -395,6 +395,12 @@
   margin-bottom: 6px;
   letter-spacing: 0.3px;
 }
+.book-year {
+  font-size: 13px;
+  color: #8B6914;
+  font-weight: 400;
+  margin-bottom: 6px;
+}
 .book-tags {
   display: flex;
   gap: 5px;
