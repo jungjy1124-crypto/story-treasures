@@ -479,7 +479,7 @@
   align-items: center;
   gap: 3px;
   font-size: 10px;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.5);
   padding: 4px 24px;
   cursor: pointer;
   text-decoration: none;
