@@ -92,7 +92,7 @@ export default function AdminAddBook() {
   };
 
   const buildPrompt = (bookInfo: BookInfo): string => {
-    return `You are a book summary writer for Chaekga (책가), a Korean classic literature summary site.
+    return `You are a book summary writer for Book Spine (책등), a Korean classic literature summary site.
 Write a bilingual summary for the following book.
 Return ONLY a JSON object with no markdown, no preamble, no explanation.
 

@@ -21,7 +21,7 @@ export default function AdminLogin() {
   return (
     <div className="admin-login-page">
       <form className="admin-login-card" onSubmit={handleLogin}>
-        <div className="admin-login-logo">📚 Chaekga</div>
+        <div className="admin-login-logo">📚 Book Spine</div>
         <p className="admin-login-subtitle">관리자 로그인</p>
 
         {error && <div className="admin-login-error">{error}</div>}
