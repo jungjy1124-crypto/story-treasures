@@ -526,10 +526,19 @@
    BOOK DETAIL PAGE
    ══════════════════════════════════════ */
 
+.book-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 32px;
+  width: 100%;
+}
+
 .book-detail-hero {
   background: #2C2013;
   overflow: hidden;
   padding-top: 56px;
+  margin-left: -32px;
+  margin-right: -32px;
 }
 
 /* ── HERO — 서가 (Book Detail) ── */

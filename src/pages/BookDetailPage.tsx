@@ -160,7 +160,7 @@ const BookDetailPage = () => {
   };
 
   return (
-    <>
+    <div className="book-detail-container">
       {/* Language Toggle */}
       <div style={{ display: "flex", justifyContent: "flex-end", padding: "16px 20px 0" }}>
         <div style={{
@@ -333,7 +333,7 @@ const BookDetailPage = () => {
       )}
 
       <div className="spacer"></div>
-    </>
+    </div>
   );
 };
 
