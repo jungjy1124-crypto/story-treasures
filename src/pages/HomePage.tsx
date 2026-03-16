@@ -149,6 +149,10 @@ const HomePage = () => {
         </div>
       </div>
 
+      <div className="hero-attribution">
+        Photo by Jaredd Craig on Unsplash
+      </div>
+
       <div className="spacer" />
     </div>
   );
