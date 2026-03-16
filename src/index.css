@@ -526,10 +526,19 @@
    BOOK DETAIL PAGE
    ══════════════════════════════════════ */
 
+.book-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 32px;
+  width: 100%;
+}
+
 .book-detail-hero {
   background: #2C2013;
   overflow: hidden;
   padding-top: 56px;
+  margin-left: -32px;
+  margin-right: -32px;
 }
 
 /* ── HERO — 서가 (Book Detail) ── */
@@ -683,7 +692,7 @@
 
 /* ── CHAPTER PROGRESS ── */
 .chapter-progress {
-  margin: 0 16px 8px;
+  margin: 0 0 8px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -709,7 +718,7 @@
 
 /* ── INTRO CARD ── */
 .intro-card {
-  margin: 24px 16px;
+  margin: 24px 0;
   background: var(--card);
   border-radius: 16px;
   padding: 24px;
@@ -725,7 +734,7 @@
 
 /* ── SECTION TITLE ── */
 .section-header {
-  padding: 28px 20px 12px;
+  padding: 28px 0 12px;
   font-family: 'Playfair Display', serif;
   font-size: 20px;
   font-weight: 700;
@@ -735,7 +744,7 @@
 /* ── CHAPTER CARD ── */
 .chapter-card {
   background: var(--card);
-  margin: 0 16px 14px;
+  margin: 0 0 14px;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -808,14 +817,14 @@
   font-size: 15px;
   line-height: 1.9;
   color: var(--text);
-  max-width: 680px;
+  max-width: none;
 }
 .chapter-body p { margin-bottom: 12px; }
 .chapter-body p:last-child { margin-bottom: 0; }
 
 /* ── CLOSING ── */
 .closing-card {
-  margin: 0 16px 14px;
+  margin: 0 0 14px;
   background: var(--accent-light);
   border-radius: 16px;
   padding: 24px 22px;
@@ -827,7 +836,7 @@
 
 /* ── QUESTION CARD ── */
 .question-card {
-  margin: 0 16px 32px;
+  margin: 0 0 32px;
   background: #2C2013;
   border-radius: 16px;
   padding: 24px 22px;
