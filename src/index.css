@@ -387,7 +387,7 @@
 }
 .book-author {
   font-size: 11px;
-  color: rgba(245,240,232,0.4);
+  color: #3D2B1F;
   margin-bottom: 6px;
   letter-spacing: 0.3px;
 }
@@ -400,8 +400,8 @@
   font-size: 9px;
   padding: 3px 8px;
   border-radius: 12px;
-  border: 1px solid rgba(201,168,76,0.3);
-  color: rgba(201,168,76,0.8);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
 }
 
 /* Featured card */
