@@ -258,8 +258,8 @@
   border-radius: 24px;
   font-size: 12px;
   font-weight: 500;
-  border: 1px solid var(--warm-brown);
-  color: var(--warm-brown);
+  border: 1.5px solid #A0845C;
+  color: #5C4A2A;
   cursor: pointer;
   transition: all 0.25s;
   white-space: nowrap;
