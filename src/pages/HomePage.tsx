@@ -41,7 +41,7 @@ const HomePage = () => {
           {isKo ? (
             <>위대한 고전을<br /><em>5분</em>에 만나다</>
           ) : (
-            <>Great Classics,<br /><em>Distilled</em></>
+            <>Classic literature,<br /><em>distilled</em></>
           )}
         </div>
         <div className="tagline-desc">
