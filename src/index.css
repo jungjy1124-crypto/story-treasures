@@ -6,9 +6,9 @@
 
 @layer base {
   :root {
-    --bg: #F5F0E8;
-    --bg-warm: #EDE7DA;
-    --card: #FDFBF7;
+    --bg: #FFFFFF;
+    --bg-warm: #F7F5F0;
+    --card: #FFFFFF;
     --card-hover: #FAF7F0;
     --text: #2C2013;
     --text-muted: #8A7D6B;
