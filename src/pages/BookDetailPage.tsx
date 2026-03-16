@@ -96,10 +96,15 @@ const BookDetailPage = () => {
     } else if (key === "question") {
       if (lang === "en") updated.question_en = val; else updated.question_ko = val;
     } else if (key.startsWith("ch_quote_")) {
-      const idx = parseInt(key.split("_")[2]);
+      const parts = key.split("_");
+      const idx = parseInt(parts[2]);
+      const qi = parseInt(parts[3]);
       updated.chapters = [...updated.chapters];
       updated.chapters[idx] = { ...updated.chapters[idx] };
-      if (lang === "en") updated.chapters[idx].quote_en = val; else updated.chapters[idx].quote_ko = val;
+      const quotesKey = lang === "en" ? "quotes_en" : "quotes_ko";
+      const newQuotes = [...(updated.chapters[idx][quotesKey] || [])];
+      newQuotes[qi] = val;
+      updated.chapters[idx][quotesKey] = newQuotes;
     } else if (key.startsWith("ch_body_")) {
       const idx = parseInt(key.split("_")[2]);
       updated.chapters = [...updated.chapters];
