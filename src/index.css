@@ -718,7 +718,7 @@
 
 /* ── INTRO CARD ── */
 .intro-card {
-  margin: 24px 16px;
+  margin: 24px 0;
   background: var(--card);
   border-radius: 16px;
   padding: 24px;
