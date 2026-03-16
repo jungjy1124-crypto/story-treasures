@@ -36,14 +36,22 @@ const Layout = () => {
       <div className="chaek-header">
         <div className="chaek-header-inner">
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Link to={isKo ? "/ko" : "/en"} className="logo">
+            <Link to={isKo ? "/ko" : "/en"} className="logo" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+              {/* 책등 아이콘 */}
+              <svg width="14" height="34" viewBox="0 0 14 34" fill="none">
+                <rect x="0" y="0" width="14" height="34" rx="2" fill="#1A0F05"/>
+                <rect x="0" y="0" width="3.5" height="34" rx="1" fill="#C9A84C" opacity="0.85"/>
+                <line x1="2" y1="7" x2="11" y2="7" stroke="#C9A84C" strokeWidth="0.6" opacity="0.55"/>
+                <line x1="2" y1="27" x2="11" y2="27" stroke="#C9A84C" strokeWidth="0.6" opacity="0.55"/>
+              </svg>
               {isKo ? (
-                <span style={{ fontFamily: "'Noto Serif KR', serif", fontWeight: 700, color: "#C9A84C" }}>책가</span>
+                <>
+                  <span style={{ fontFamily: "'Noto Serif KR', Georgia, serif", fontSize: 19, fontWeight: 600, color: "#C9A84C", lineHeight: "34px", letterSpacing: "-0.5px" }}>책등</span>
+                  <div style={{ width: 1, height: 18, background: "#C9A84C", opacity: 0.35 }} />
+                  <span style={{ fontFamily: "Georgia, serif", fontSize: 12, fontWeight: 400, color: "#C9A84C", opacity: 0.65, lineHeight: "34px", letterSpacing: 1 }}>Book Spine</span>
+                </>
               ) : (
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1 }}>
-                  <span style={{ fontFamily: "'EB Garamond', serif", fontWeight: 700, color: "#C9A84C" }}>Chaekga</span>
-                  <span style={{ fontSize: 10, letterSpacing: "0.15em", color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}>classics, by your side</span>
-                </span>
+                <span style={{ fontFamily: "Georgia, serif", fontSize: 19, fontWeight: 600, color: "#C9A84C", lineHeight: "34px", letterSpacing: "0.5px" }}>Book Spine</span>
               )}
             </Link>
             {isAdmin && (
