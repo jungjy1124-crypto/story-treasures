@@ -246,6 +246,18 @@ const BookDetailPage = () => {
         {editing["intro"] !== undefined ? renderEditable("intro", intro) : <p>{intro}</p>}
       </div>
 
+      {/* CHAPTER PROGRESS */}
+      {book.chapters.length > 0 && (
+        <div className="chapter-progress">
+          <div className="chapter-progress-bar">
+            <div className="chapter-progress-fill" style={{ width: "100%" }} />
+          </div>
+          <div className="chapter-progress-text">
+            {book.chapters.length} {lang === "ko" ? "챕터" : "chapters"}
+          </div>
+        </div>
+      )}
+
       {/* SECTION TITLE */}
       <div className="section-header">{lang === "ko" ? "주요 요점" : "Key Points"}</div>
 
