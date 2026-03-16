@@ -51,7 +51,14 @@ function rowToBook(row: any): StoredBook {
     question_en: row.question_en || "",
     tags_ko: row.tags_ko || [],
     tags_en: row.tags_en || [],
-    chapters: Array.isArray(row.chapters) ? row.chapters : [],
+    chapters: Array.isArray(row.chapters)
+      ? row.chapters.map((ch: any) => ({
+          ...ch,
+          // Migrate legacy single quote to quotes array
+          quotes_ko: ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : []),
+          quotes_en: ch.quotes_en || (ch.quote_en ? [ch.quote_en] : []),
+        }))
+      : [],
     created_at: row.created_at || new Date().toISOString(),
   };
 }
