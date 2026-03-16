@@ -34,15 +34,16 @@ const HomePage = () => {
 
   return (
     <div className="hero">
+      {/* Hero background image */}
+      <div className="hero-bg-image" />
+
       {/* Tagline */}
       <div className="hero-tagline">
         <div className="tagline-sub">Classic Literature</div>
         <div className="tagline-main">
-          {isKo ? (
-            <>위대한 고전을<br /><em>5분</em>에 만나다</>
-          ) : (
-            <>Classic literature,<br /><em>distilled</em></>
-          )}
+          {isKo
+            ? "펼치기 전에 미리 보는 고전"
+            : "Meet the classics before you open them"}
         </div>
         <div className="tagline-desc">
           {isKo
