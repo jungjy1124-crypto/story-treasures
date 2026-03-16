@@ -117,7 +117,15 @@ export async function saveBook(book: StoredBook): Promise<{ success: boolean; er
     question_en: book.question_en || null,
     tags_ko: book.tags_ko || [],
     tags_en: book.tags_en || [],
-    chapters: book.chapters as any,
+    chapters: book.chapters.map(ch => ({
+      number: ch.number,
+      title_ko: ch.title_ko,
+      title_en: ch.title_en,
+      quotes_ko: ch.quotes_ko || [],
+      quotes_en: ch.quotes_en || [],
+      body_ko: ch.body_ko,
+      body_en: ch.body_en,
+    })) as any,
   };
 
   if (existing) {
