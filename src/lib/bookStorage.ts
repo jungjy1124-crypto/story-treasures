@@ -21,10 +21,13 @@ export interface StoredBook {
     number: number;
     title_ko: string;
     title_en: string;
-    quote_ko: string;
-    quote_en: string;
+    quotes_ko: string[];
+    quotes_en: string[];
     body_ko: string;
     body_en: string;
+    // Legacy single-quote fields (for backward compat)
+    quote_ko?: string;
+    quote_en?: string;
   }[];
   created_at: string;
 }
