@@ -285,25 +285,27 @@ const BookDetailPage = () => {
               <div className="chapter-num">{ch.number}</div>
               <div className="chapter-title">{title}</div>
             </div>
-            <div className="chapter-quotes-stack">
-              {quotes.map((quote, qi) => {
-                if (!quote || !quote.trim()) return null;
-                const editKey = `ch_quote_${idx}_${qi}`;
-                return (
-                  <div key={qi} className={`chapter-quote quote-rank-${qi} editable-section`}>
-                    {editButton(editKey, quote)}
-                    {editing[editKey] !== undefined
-                      ? renderEditable(editKey, quote)
-                      : <span>{quote}</span>}
-                  </div>
-                );
-              })}
-            </div>
-            <div className="chapter-body editable-section">
-              {editButton(`ch_body_${idx}`, body)}
-              {editing[`ch_body_${idx}`] !== undefined
-                ? renderEditable(`ch_body_${idx}`, body)
-                : <p>{body}</p>}
+            <div className="chapter-card-body">
+              <div className="chapter-quotes-stack">
+                {quotes.map((quote, qi) => {
+                  if (!quote || !quote.trim()) return null;
+                  const editKey = `ch_quote_${idx}_${qi}`;
+                  return (
+                    <div key={qi} className={`chapter-quote quote-rank-${qi} editable-section`}>
+                      {editButton(editKey, quote)}
+                      {editing[editKey] !== undefined
+                        ? renderEditable(editKey, quote)
+                        : <span>{quote}</span>}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="chapter-body editable-section">
+                {editButton(`ch_body_${idx}`, body)}
+                {editing[`ch_body_${idx}`] !== undefined
+                  ? renderEditable(`ch_body_${idx}`, body)
+                  : <p>{body}</p>}
+              </div>
             </div>
           </div>
         );
