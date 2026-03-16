@@ -165,35 +165,37 @@ const BookDetailPage = () => {
       <div style={{ display: "flex", justifyContent: "flex-end", padding: "16px 20px 0" }}>
         <div style={{
           display: "inline-flex",
-          borderRadius: 8,
+          borderRadius: 20,
           overflow: "hidden",
-          border: "1px solid rgba(201,168,76,0.3)",
+          border: "1px solid var(--border)",
+          background: "var(--bg-warm)",
         }}>
           <button
             onClick={() => setLang("ko")}
             style={{
-              padding: "6px 16px",
+              padding: "6px 18px",
               fontSize: 13,
               fontWeight: 600,
               border: "none",
               cursor: "pointer",
-              background: lang === "ko" ? "#c9a84c" : "transparent",
-              color: lang === "ko" ? "#1a1a1a" : "#c9a84c",
+              background: lang === "ko" ? "var(--accent)" : "transparent",
+              color: lang === "ko" ? "#1C1410" : "var(--text-muted)",
               transition: "all 0.2s",
+              borderRadius: lang === "ko" ? 18 : 0,
             }}
           >KO</button>
           <button
             onClick={() => setLang("en")}
             style={{
-              padding: "6px 16px",
+              padding: "6px 18px",
               fontSize: 13,
               fontWeight: 600,
               border: "none",
-              borderLeft: "1px solid rgba(201,168,76,0.3)",
               cursor: "pointer",
-              background: lang === "en" ? "#c9a84c" : "transparent",
-              color: lang === "en" ? "#1a1a1a" : "#c9a84c",
+              background: lang === "en" ? "var(--accent)" : "transparent",
+              color: lang === "en" ? "#1C1410" : "var(--text-muted)",
               transition: "all 0.2s",
+              borderRadius: lang === "en" ? 18 : 0,
             }}
           >EN</button>
         </div>
@@ -243,6 +245,18 @@ const BookDetailPage = () => {
         {editButton("intro", intro)}
         {editing["intro"] !== undefined ? renderEditable("intro", intro) : <p>{intro}</p>}
       </div>
+
+      {/* CHAPTER PROGRESS */}
+      {book.chapters.length > 0 && (
+        <div className="chapter-progress">
+          <div className="chapter-progress-bar">
+            <div className="chapter-progress-fill" style={{ width: "100%" }} />
+          </div>
+          <div className="chapter-progress-text">
+            {book.chapters.length} {lang === "ko" ? "챕터" : "chapters"}
+          </div>
+        </div>
+      )}
 
       {/* SECTION TITLE */}
       <div className="section-header">{lang === "ko" ? "주요 요점" : "Key Points"}</div>
