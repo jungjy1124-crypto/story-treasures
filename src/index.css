@@ -175,7 +175,7 @@
   font-family: 'Playfair Display', serif;
   font-size: 38px;
   font-weight: 700;
-  color: #F5F0E8;
+  color: var(--dark-brown);
   line-height: 1.2;
   letter-spacing: -0.5px;
   margin-bottom: 14px;
