@@ -157,7 +157,7 @@
 
 /* ── TAGLINE ── */
 .hero-tagline {
-  padding: 48px 24px 32px;
+  padding: 48px 24px 72px;
   position: relative;
   z-index: 1;
 }
@@ -175,7 +175,7 @@
   font-family: 'Playfair Display', serif;
   font-size: 38px;
   font-weight: 700;
-  color: var(--dark-brown);
+  color: #1A0F05;
   line-height: 1.2;
   letter-spacing: -0.5px;
   margin-bottom: 14px;
@@ -184,11 +184,12 @@
 }
 .tagline-main em {
   font-style: italic;
-  color: var(--accent);
+  color: #C9A84C;
+  font-weight: 800;
 }
 .tagline-desc {
   font-size: 13px;
-  color: var(--text-muted);
+  color: #5C4A2A;
   line-height: 1.7;
   max-width: 320px;
   white-space: pre-line;
