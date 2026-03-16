@@ -537,8 +537,10 @@
   background: #2C2013;
   overflow: hidden;
   padding-top: 56px;
-  margin-left: -32px;
-  margin-right: -32px;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* ── HERO — 서가 (Book Detail) ── */
