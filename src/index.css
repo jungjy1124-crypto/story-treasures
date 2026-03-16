@@ -540,7 +540,7 @@
 
 .shelf-plank {
   height: 12px;
-  background: linear-gradient(180deg, #8A5A30 0%, #5A3010 60%, #3A2008 100%);
+  background: linear-gradient(180deg, #8A5A30 0%, #5A3010 100%);
   box-shadow: 0 5px 14px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
   border-top: 2px solid #AA7040;
 }
