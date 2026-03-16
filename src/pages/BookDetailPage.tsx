@@ -290,7 +290,7 @@ const BookDetailPage = () => {
                 if (!quote || !quote.trim()) return null;
                 const editKey = `ch_quote_${idx}_${qi}`;
                 return (
-                  <div key={qi} className="chapter-quote editable-section" style={{ marginBottom: qi < quotes.length - 1 ? 8 : 0 }}>
+                  <div key={qi} className={`chapter-quote quote-rank-${qi} editable-section`}>
                     {editButton(editKey, quote)}
                     {editing[editKey] !== undefined
                       ? renderEditable(editKey, quote)
