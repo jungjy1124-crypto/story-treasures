@@ -38,11 +38,11 @@ const Layout = () => {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Link to={isKo ? "/ko" : "/en"} className="logo">
               {isKo ? (
-                <span style={{ fontFamily: "'Noto Serif KR', serif", fontWeight: 700, color: "var(--accent)" }}>책가</span>
+                <span style={{ fontFamily: "'Noto Serif KR', serif", fontWeight: 700, color: "#C9A84C" }}>책가</span>
               ) : (
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1 }}>
-                  <span style={{ fontFamily: "'EB Garamond', serif", fontWeight: 700, color: "var(--accent)" }}>Chaekga</span>
-                  <span style={{ fontSize: 10, letterSpacing: "0.15em", color: "var(--text-muted)", fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}>classics, by your side</span>
+                  <span style={{ fontFamily: "'EB Garamond', serif", fontWeight: 700, color: "#C9A84C" }}>Chaekga</span>
+                  <span style={{ fontSize: 10, letterSpacing: "0.15em", color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}>classics, by your side</span>
                 </span>
               )}
             </Link>
