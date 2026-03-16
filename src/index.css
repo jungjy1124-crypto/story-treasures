@@ -114,7 +114,7 @@
 .header-right { display: flex; align-items: center; gap: 12px; }
 .lang-toggle {
   display: flex;
-  background: rgba(44,32,19,0.06);
+  background: rgba(255,255,255,0.1);
   border-radius: 20px;
   padding: 2px;
   gap: 0;
@@ -124,22 +124,22 @@
   border-radius: 16px;
   font-size: 11px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.5);
   cursor: pointer;
   transition: all 0.2s;
 }
 .lang-btn.active {
   background: var(--accent);
-  color: #fff;
+  color: #2C1F0E;
   font-weight: 700;
 }
 .menu-btn {
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.5);
   font-size: 18px;
   cursor: pointer;
   transition: color 0.2s;
 }
-.menu-btn:hover { color: var(--text); }
+.menu-btn:hover { color: #fff; }
 
 /* ── HERO ── */
 .hero {
