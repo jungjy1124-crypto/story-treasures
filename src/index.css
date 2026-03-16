@@ -602,7 +602,7 @@
 .b3  { width: 18px; background: linear-gradient(to bottom, #2A3A5A, #1A2A44); }
 .b-main {
   width: 32px;
-  background: linear-gradient(160deg, #2C2013 0%, #3D2E1A 45%, #2C2013 100%);
+  background: #2C2013;
 }
 .b-main .spine-text { color: var(--accent); font-size: 11px; letter-spacing: 2px; font-weight: 700; }
 .b-main .spine-inner {
