@@ -6,16 +6,18 @@
 
 @layer base {
   :root {
-    --bg: #FFFFFF;
-    --bg-warm: #F7F5F0;
+    --bg: #FAF7F2;
+    --bg-warm: #F5F0E8;
     --card: #FFFFFF;
     --card-hover: #F7F5F0;
-    --text: #2C2013;
-    --text-muted: #8A7D6B;
+    --text: #2C1F0E;
+    --text-muted: #9B8B6E;
     --accent: #C9A84C;
     --accent-light: #F5ECD4;
     --accent-subtle: rgba(201,168,76,0.08);
-    --border: #E0D8C8;
+    --border: #E8E0D0;
+    --warm-brown: #8B6914;
+    --dark-brown: #2C1F0E;
     --quote-bg: #F7F2E8;
     --shadow-soft: 0 2px 12px rgba(44,32,19,0.06);
     --shadow-card: 0 4px 20px rgba(44,32,19,0.08);
