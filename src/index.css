@@ -506,7 +506,7 @@
    ══════════════════════════════════════ */
 
 .book-detail-hero {
-  background: linear-gradient(180deg, #2C2013 0%, #3D2E1A 45%, #5A4428 80%, var(--bg) 100%);
+  background: #2C2013;
   overflow: hidden;
   padding-top: 56px;
 }
