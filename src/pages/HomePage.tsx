@@ -92,7 +92,7 @@ const HomePage = () => {
         )}
 
         {!loading && books.length === 0 && (
-          <div style={{ textAlign: "center", padding: "40px 0", color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+          <div style={{ textAlign: "center", padding: "40px 0", color: "#9B7E5A", fontSize: 14 }}>
             {isKo ? "아직 등록된 책이 없어요." : "No books yet."}
           </div>
         )}
