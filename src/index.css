@@ -188,7 +188,7 @@
 }
 .tagline-desc {
   font-size: 13px;
-  color: rgba(245,240,232,0.55);
+  color: var(--text-muted);
   line-height: 1.7;
   max-width: 320px;
   white-space: pre-line;
