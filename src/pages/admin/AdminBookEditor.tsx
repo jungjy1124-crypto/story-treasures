@@ -1,4 +1,5 @@
 import { useState } from "react";
+import RawTextClassifier from "@/components/admin/RawTextClassifier";
 
 interface Chapter {
   number: number;
@@ -66,6 +67,12 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
 
   return (
     <div className="admin-editor">
+      {/* Raw Text Classifier */}
+      <RawTextClassifier
+        chapters={summary.chapters}
+        onApply={(chapters) => update({ chapters })}
+      />
+
       {/* Intro */}
       <div className="admin-card">
         <label className="admin-label">소개 / Intro</label>
