@@ -41,9 +41,31 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
     });
   };
 
+  // Safely extract a string from any value (handles nested objects, arrays)
+  const toStr = (v: unknown): string => {
+    if (v == null) return "";
+    if (typeof v === "string") return v;
+    if (typeof v === "number") return String(v);
+    if (Array.isArray(v)) return v.map(toStr).join("\n");
+    if (typeof v === "object") {
+      const o = v as Record<string, unknown>;
+      // Try common keys
+      return toStr(o.text || o.content || o.value || o.KO || o.ko || o.EN || o.en || Object.values(o)[0] || "");
+    }
+    return String(v);
+  };
+
   const applyResult = (parsed: any) => {
     const resultChapters = parsed.chapters || [];
     const updatedChapters = [...chapters];
+
+    console.log("=== CLASSIFY DEBUG ===");
+    console.log("parsed:", JSON.stringify(parsed, null, 2));
+    console.log("resultChapters count:", resultChapters.length);
+    if (resultChapters[0]) {
+      console.log("chapter 0 title:", resultChapters[0].title, "type:", typeof resultChapters[0].title);
+      console.log("chapter 0 body:", resultChapters[0].body, "type:", typeof resultChapters[0].body);
+    }
 
     for (let i = 0; i < resultChapters.length && i < updatedChapters.length; i++) {
       const rc = resultChapters[i];
@@ -52,14 +74,14 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
       const bodyKey = lang === "ko" ? "body_ko" : "body_en";
 
       if (fillTitle) {
-        updatedChapters[i] = { ...updatedChapters[i], [titleKey]: String(rc.title || "") };
+        updatedChapters[i] = { ...updatedChapters[i], [titleKey]: toStr(rc.title) };
       }
       if (fillQuote) {
-        const quotes = [String(rc.quote_1 || ""), String(rc.quote_2 || "")].filter((q) => q);
+        const quotes = [toStr(rc.quote_1), toStr(rc.quote_2)].filter((q) => q);
         updatedChapters[i] = { ...updatedChapters[i], [quotesKey]: quotes };
       }
       if (fillBody) {
-        updatedChapters[i] = { ...updatedChapters[i], [bodyKey]: String(rc.body || "") };
+        updatedChapters[i] = { ...updatedChapters[i], [bodyKey]: toStr(rc.body) };
       }
     }
 
