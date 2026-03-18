@@ -202,32 +202,6 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
             {isClassifying ? "분류 중..." : "✦ 자동 분류하기"}
           </button>
 
-          {/* Overwrite confirmation */}
-          {showOverwriteConfirm && (
-            <div className="admin-classifier-warning">
-              <p>⚠️ 기존에 입력된 내용이 있습니다. 덮어쓰시겠습니까?</p>
-              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button
-                  className="admin-btn-primary"
-                  style={{ fontSize: 13, padding: "6px 16px" }}
-                  onClick={() => applyResult(pendingResult)}
-                >
-                  확인
-                </button>
-                <button
-                  className="admin-btn-secondary"
-                  style={{ fontSize: 13, padding: "6px 16px" }}
-                  onClick={() => {
-                    setShowOverwriteConfirm(false);
-                    setPendingResult(null);
-                  }}
-                >
-                  취소
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Result feedback */}
           {classifyResult === "success" && (
             <div className="admin-classifier-result success">
