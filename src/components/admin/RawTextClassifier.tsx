@@ -27,23 +27,16 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
   const [fillBody, setFillBody] = useState(true);
   const [isClassifying, setIsClassifying] = useState(false);
   const [classifyResult, setClassifyResult] = useState<"success" | "error" | null>(null);
-  const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
-  const [pendingResult, setPendingResult] = useState<any>(null);
 
   const hasExistingContent = () => {
     return chapters.some((ch) => {
-      if (fillTitle) {
-        const title = lang === "ko" ? ch.title_ko : ch.title_en;
-        if (title && title.trim()) return true;
-      }
+      const s = (v: unknown) => typeof v === "string" ? v.trim() : "";
+      if (fillTitle && s(lang === "ko" ? ch.title_ko : ch.title_en)) return true;
       if (fillQuote) {
         const quotes = lang === "ko" ? ch.quotes_ko : ch.quotes_en;
-        if (quotes && quotes.some((q) => q.trim())) return true;
+        if (quotes && quotes.some((q) => s(q))) return true;
       }
-      if (fillBody) {
-        const body = lang === "ko" ? ch.body_ko : ch.body_en;
-        if (body && body.trim()) return true;
-      }
+      if (fillBody && s(lang === "ko" ? ch.body_ko : ch.body_en)) return true;
       return false;
     });
   };
@@ -58,54 +51,52 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
       const quotesKey = lang === "ko" ? "quotes_ko" : "quotes_en";
       const bodyKey = lang === "ko" ? "body_ko" : "body_en";
 
-      if (fillTitle && rc.title) {
-        updatedChapters[i] = { ...updatedChapters[i], [titleKey]: rc.title };
+      if (fillTitle) {
+        updatedChapters[i] = { ...updatedChapters[i], [titleKey]: String(rc.title || "") };
       }
       if (fillQuote) {
-        const quotes = [rc.quote_1 || "", rc.quote_2 || ""].filter((q) => q);
-        if (quotes.length > 0) {
-          updatedChapters[i] = { ...updatedChapters[i], [quotesKey]: quotes };
-        }
+        const quotes = [String(rc.quote_1 || ""), String(rc.quote_2 || "")].filter((q) => q);
+        updatedChapters[i] = { ...updatedChapters[i], [quotesKey]: quotes };
       }
-      if (fillBody && rc.body) {
-        updatedChapters[i] = { ...updatedChapters[i], [bodyKey]: rc.body };
+      if (fillBody) {
+        updatedChapters[i] = { ...updatedChapters[i], [bodyKey]: String(rc.body || "") };
       }
     }
 
-    // If AI returned more chapters than exist, add them
     for (let i = updatedChapters.length; i < resultChapters.length; i++) {
       const rc = resultChapters[i];
       const newCh: Chapter = {
-        number: i + 1,
-        title_ko: "",
-        title_en: "",
-        quotes_ko: [],
-        quotes_en: [],
-        body_ko: "",
-        body_en: "",
+        number: i + 1, title_ko: "", title_en: "",
+        quotes_ko: [], quotes_en: [], body_ko: "", body_en: "",
       };
-      if (fillTitle && rc.title) {
-        newCh[lang === "ko" ? "title_ko" : "title_en"] = rc.title;
-      }
-      if (fillQuote) {
-        const quotes = [rc.quote_1 || "", rc.quote_2 || ""].filter((q) => q);
-        newCh[lang === "ko" ? "quotes_ko" : "quotes_en"] = quotes;
-      }
-      if (fillBody && rc.body) {
-        newCh[lang === "ko" ? "body_ko" : "body_en"] = rc.body;
-      }
+      if (fillTitle) newCh[lang === "ko" ? "title_ko" : "title_en"] = String(rc.title || "");
+      if (fillQuote) newCh[lang === "ko" ? "quotes_ko" : "quotes_en"] = [String(rc.quote_1 || ""), String(rc.quote_2 || "")].filter(q => q);
+      if (fillBody) newCh[lang === "ko" ? "body_ko" : "body_en"] = String(rc.body || "");
       updatedChapters.push(newCh);
     }
 
     onApply(updatedChapters);
     setClassifyResult("success");
     setRawText("");
-    setPendingResult(null);
-    setShowOverwriteConfirm(false);
+
+    // Auto-scroll to first chapter
+    setTimeout(() => {
+      document.querySelector(".admin-chapter-card")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   const handleAutoClassify = async () => {
     if (!rawText.trim()) return;
+
+    // Simple window.confirm for overwrite
+    if (hasExistingContent()) {
+      const confirmed = window.confirm(
+        "이미 입력된 내용이 있습니다.\n새로운 내용으로 덮어쓰시겠습니까?"
+      );
+      if (!confirmed) return;
+    }
+
     setIsClassifying(true);
     setClassifyResult(null);
 
@@ -117,21 +108,14 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
 
-      const parsed = data.result;
-
-      if (hasExistingContent()) {
-        setPendingResult(parsed);
-        setShowOverwriteConfirm(true);
-      } else {
-        applyResult(parsed);
-      }
+      applyResult(data.result);
     } catch (e: any) {
       console.error("분류 실패:", e);
       setClassifyResult("error");
       toast({ title: "분류 실패", description: e.message, variant: "destructive" });
+    } finally {
+      setIsClassifying(false);
     }
-
-    setIsClassifying(false);
   };
 
   return (
@@ -217,32 +201,6 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
           >
             {isClassifying ? "분류 중..." : "✦ 자동 분류하기"}
           </button>
-
-          {/* Overwrite confirmation */}
-          {showOverwriteConfirm && (
-            <div className="admin-classifier-warning">
-              <p>⚠️ 기존에 입력된 내용이 있습니다. 덮어쓰시겠습니까?</p>
-              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button
-                  className="admin-btn-primary"
-                  style={{ fontSize: 13, padding: "6px 16px" }}
-                  onClick={() => applyResult(pendingResult)}
-                >
-                  확인
-                </button>
-                <button
-                  className="admin-btn-secondary"
-                  style={{ fontSize: 13, padding: "6px 16px" }}
-                  onClick={() => {
-                    setShowOverwriteConfirm(false);
-                    setPendingResult(null);
-                  }}
-                >
-                  취소
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Result feedback */}
           {classifyResult === "success" && (
