@@ -39,6 +39,17 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
   const [newTagKo, setNewTagKo] = useState("");
   const [newTagEn, setNewTagEn] = useState("");
 
+  // Safety: ensure value is a string (handles objects like {KO, EN})
+  const str = (v: unknown): string => {
+    if (typeof v === "string") return v;
+    if (v == null) return "";
+    if (typeof v === "object") {
+      const obj = v as Record<string, unknown>;
+      return String(obj.KO || obj.ko || obj.EN || obj.en || "");
+    }
+    return String(v);
+  };
+
   const update = (patch: Partial<SummaryData>) => onSummaryChange({ ...summary, ...patch });
 
   const updateChapter = (idx: number, patch: Partial<Chapter>) => {
