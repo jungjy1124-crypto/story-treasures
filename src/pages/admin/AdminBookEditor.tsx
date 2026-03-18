@@ -133,7 +133,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
                   const quotes = lang === "ko"
                     ? (ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : [""]))
                     : (ch.quotes_en || (ch.quote_en ? [ch.quote_en] : [""]));
-                  const quoteVal = quotes[qi] || "";
+                  const quoteVal = str(quotes[qi]) || "";
                   if (qi === 2 && !quoteVal && quotes.length < 3) return null;
                   return (
                     <div key={qi}>
