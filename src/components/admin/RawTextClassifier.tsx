@@ -91,9 +91,9 @@ export default function RawTextClassifier({ chapters, onApply }: Props) {
         number: i + 1, title_ko: "", title_en: "",
         quotes_ko: [], quotes_en: [], body_ko: "", body_en: "",
       };
-      if (fillTitle) newCh[lang === "ko" ? "title_ko" : "title_en"] = String(rc.title || "");
-      if (fillQuote) newCh[lang === "ko" ? "quotes_ko" : "quotes_en"] = [String(rc.quote_1 || ""), String(rc.quote_2 || "")].filter(q => q);
-      if (fillBody) newCh[lang === "ko" ? "body_ko" : "body_en"] = String(rc.body || "");
+      if (fillTitle) newCh[lang === "ko" ? "title_ko" : "title_en"] = toStr(rc.title);
+      if (fillQuote) newCh[lang === "ko" ? "quotes_ko" : "quotes_en"] = [toStr(rc.quote_1), toStr(rc.quote_2)].filter(q => q);
+      if (fillBody) newCh[lang === "ko" ? "body_ko" : "body_en"] = toStr(rc.body);
       updatedChapters.push(newCh);
     }
 
