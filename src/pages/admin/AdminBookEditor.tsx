@@ -125,7 +125,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
                 <label className="admin-label">제목</label>
                 <input
                   className="admin-input"
-                  value={lang === "ko" ? ch.title_ko : ch.title_en}
+                  value={str(lang === "ko" ? ch.title_ko : ch.title_en)}
                   onChange={(e) => updateChapter(idx, lang === "ko" ? { title_ko: e.target.value } : { title_en: e.target.value })}
                 />
 
