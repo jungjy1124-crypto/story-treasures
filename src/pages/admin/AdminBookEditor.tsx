@@ -39,6 +39,17 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
   const [newTagKo, setNewTagKo] = useState("");
   const [newTagEn, setNewTagEn] = useState("");
 
+  // Safety: ensure value is a string (handles objects like {KO, EN})
+  const str = (v: unknown): string => {
+    if (typeof v === "string") return v;
+    if (v == null) return "";
+    if (typeof v === "object") {
+      const obj = v as Record<string, unknown>;
+      return String(obj.KO || obj.ko || obj.EN || obj.en || "");
+    }
+    return String(v);
+  };
+
   const update = (patch: Partial<SummaryData>) => onSummaryChange({ ...summary, ...patch });
 
   const updateChapter = (idx: number, patch: Partial<Chapter>) => {
@@ -94,7 +105,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
               className="admin-chapter-header"
               onClick={() => setOpenChapter(isOpen ? null : idx)}
             >
-              <span>챕터 {ch.number}: {ch.title_ko}</span>
+              <span>챕터 {ch.number}: {str(ch.title_ko)}</span>
               <span className="admin-chevron">{isOpen ? "▲" : "▼"}</span>
             </button>
 
@@ -114,7 +125,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
                 <label className="admin-label">제목</label>
                 <input
                   className="admin-input"
-                  value={lang === "ko" ? ch.title_ko : ch.title_en}
+                  value={str(lang === "ko" ? ch.title_ko : ch.title_en)}
                   onChange={(e) => updateChapter(idx, lang === "ko" ? { title_ko: e.target.value } : { title_en: e.target.value })}
                 />
 
@@ -122,7 +133,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
                   const quotes = lang === "ko"
                     ? (ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : [""]))
                     : (ch.quotes_en || (ch.quote_en ? [ch.quote_en] : [""]));
-                  const quoteVal = quotes[qi] || "";
+                  const quoteVal = str(quotes[qi]) || "";
                   if (qi === 2 && !quoteVal && quotes.length < 3) return null;
                   return (
                     <div key={qi}>
@@ -170,7 +181,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
                 <textarea
                   className="admin-textarea"
                   rows={5}
-                  value={lang === "ko" ? ch.body_ko : ch.body_en}
+                  value={str(lang === "ko" ? ch.body_ko : ch.body_en)}
                   onChange={(e) => updateChapter(idx, lang === "ko" ? { body_ko: e.target.value } : { body_en: e.target.value })}
                 />
               </div>

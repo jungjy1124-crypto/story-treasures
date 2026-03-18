@@ -273,8 +273,14 @@ const BookDetailPage = () => {
         const body = getField(chapterData, "body_en", "body_ko");
 
         // Get quotes array with backward compat
-        const quotesKo = (ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : []));
-        const quotesEn = (ch.quotes_en || (ch.quote_en ? [ch.quote_en] : []));
+        const safeStr = (v: unknown): string => {
+          if (typeof v === "string") return v;
+          if (v == null) return "";
+          if (typeof v === "object") { const o = v as any; return String(o.KO || o.ko || o.EN || o.en || ""); }
+          return String(v);
+        };
+        const quotesKo = (ch.quotes_ko || (ch.quote_ko ? [ch.quote_ko] : [])).map(safeStr);
+        const quotesEn = (ch.quotes_en || (ch.quote_en ? [ch.quote_en] : [])).map(safeStr);
         const quotes = lang === "en"
           ? quotesEn.map((q, i) => (q && q.trim()) ? q : (quotesKo[i] || ""))
           : quotesKo;
