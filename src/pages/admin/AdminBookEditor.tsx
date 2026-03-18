@@ -105,7 +105,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
               className="admin-chapter-header"
               onClick={() => setOpenChapter(isOpen ? null : idx)}
             >
-              <span>챕터 {ch.number}: {ch.title_ko}</span>
+              <span>챕터 {ch.number}: {str(ch.title_ko)}</span>
               <span className="admin-chevron">{isOpen ? "▲" : "▼"}</span>
             </button>
 
