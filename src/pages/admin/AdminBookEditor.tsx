@@ -181,7 +181,7 @@ export default function AdminBookEditor({ summary, onSummaryChange, onBack, onSa
                 <textarea
                   className="admin-textarea"
                   rows={5}
-                  value={lang === "ko" ? ch.body_ko : ch.body_en}
+                  value={str(lang === "ko" ? ch.body_ko : ch.body_en)}
                   onChange={(e) => updateChapter(idx, lang === "ko" ? { body_ko: e.target.value } : { body_en: e.target.value })}
                 />
               </div>
